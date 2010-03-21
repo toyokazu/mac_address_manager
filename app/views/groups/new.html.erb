@@ -1,0 +1,12 @@
+<h1>グループの新規作成</h1>
+
+<% form_for(@group) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+    <%= f.submit '作成' %>
+  </p>
+<% end %>
+
+<%= link_to '戻る', groups_path %>

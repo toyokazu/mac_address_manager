@@ -1,0 +1,19 @@
+<h1>ユーザ編集</h1>
+
+<% form_for(@user) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+
+  <p>
+    <%= f.label :default_group_id, 'デフォルトグループ' %><br />
+    <%= f.select(:default_group_id, @user.groups.collect {|group| [group.display_name, group.id] }) %>
+  </p>
+
+  <p>
+    <%= f.submit '更新' %>
+  </p>
+<% end %>
+
+<%= link_to '詳細', @user %> |
+<%= link_to '戻る', users_path %>

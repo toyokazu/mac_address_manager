@@ -39,3 +39,8 @@ Rails::Initializer.run do |config|
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
 end
+
+require 'casclient'
+require 'casclient/frameworks/rails/filter'
+# change :cas_base_url to your CAS server
+CASClient::Frameworks::Rails::Filter.configure(:cas_base_url => "https://localhost.localdomain:8443/")

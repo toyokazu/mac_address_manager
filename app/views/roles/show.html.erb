@@ -1,0 +1,12 @@
+<p>
+  <b>ロール識別子:</b>
+  <%=h @role.name %>
+</p>
+
+<p>
+  <b>ロール名:</b>
+  <%=h @role.display_name %>
+</p>
+
+<%= link_to '編集', edit_role_path(@role) %> |
+<%= link_to '戻る', roles_path %>

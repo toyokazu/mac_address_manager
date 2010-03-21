@@ -1,0 +1,21 @@
+<h1>グループの編集</h1>
+
+<% form_for(@group) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+  <% @user_ids = params[:users] || @group.user_ids %>
+  <% @users = User.all %>
+  <%= label_tag :users, 'メンバー' %><br />
+  <% @users.each do |user| %>
+    <%= check_box_tag 'group[user_ids][]', user.id, @user_ids.include?(user.id), :disabled => (user.id == @group.user_id) %><%= h user.display_name %><br />
+  <% end %>
+  </p>
+  <p>
+    <%= f.submit '更新' %>
+  </p>
+<% end %>
+
+<%= link_to '詳細', @group %> |
+<%= link_to '戻る', groups_path %>

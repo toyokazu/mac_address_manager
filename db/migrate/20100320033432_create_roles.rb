@@ -1,0 +1,15 @@
+class CreateRoles < ActiveRecord::Migration
+  def self.up
+    create_table :roles do |t|
+      t.string :name
+      t.string :display_name
+      t.timestamp :deleted_at
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :roles
+  end
+end

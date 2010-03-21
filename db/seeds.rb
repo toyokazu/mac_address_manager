@@ -5,3 +5,11 @@
 #   
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Major.create(:name => 'Daley', :city => cities.first)
+
+# create admin user
+# change the following user to the existent user
+# admin_user = User.create(:name => 'akiyama', :display_name => 'Toyokazu Akiyama (admin)')
+admin_user = User.create(:name => 'admin', :display_name => '管理者', :contact => 'root@example.com')
+# create admin role
+admin_role = Role.create(:name => 'admin', :display_name => '管理者')
+admin_user.roles << admin_role

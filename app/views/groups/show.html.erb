@@ -1,0 +1,12 @@
+<p>
+  <b>管理者:</b>
+  <%=h (@group.user.nil?)? '' : @group.user.display_name %>
+</p>
+
+<p>
+  <b>グループ名:</b>
+  <%=h @group.display_name %>
+</p>
+
+<%= link_to '編集', edit_group_path(@group) %> |
+<%= link_to '戻る', groups_path %>

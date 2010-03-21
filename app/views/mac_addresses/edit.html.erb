@@ -1,0 +1,13 @@
+<h1>MACアドレスの編集</h1>
+
+<% form_for(@mac_address) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+    <%= f.submit '更新' %>
+  </p>
+<% end %>
+
+<%= link_to '詳細', @mac_address %> |
+<%= link_to '戻る', mac_addresses_path %>

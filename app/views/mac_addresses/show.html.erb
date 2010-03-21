@@ -1,0 +1,37 @@
+<p>
+  <b>管理グループ:</b>
+  <%=h @mac_address.group.display_name %>
+</p>
+
+<p>
+  <b>ホスト名:</b>
+  <%=h @mac_address.hostname %>
+</p>
+
+<p>
+  <b>MACアドレス:</b>
+  <%=h @mac_address.mac_addr %>
+</p>
+
+<p>
+  <b>IPv4アドレス:</b>
+  <%=h @mac_address.ipv4_addr %>
+</p>
+
+<p>
+  <b>IPv6アドレス:</b>
+  <%=h @mac_address.ipv6_addr %>
+</p>
+
+<p>
+  <b>設置場所:</b>
+  <%=h @mac_address.location.description %>
+</p>
+
+<p>
+  <b>備考:</b>
+  <%=h @mac_address.description %>
+</p>
+
+<%= link_to '編集', edit_mac_address_path(@mac_address) %> |
+<%= link_to '戻る', mac_addresses_path %>

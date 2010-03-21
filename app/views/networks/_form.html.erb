@@ -1,0 +1,12 @@
+  <p>
+    <%= form.label :user, '管理者' %><br />
+    <%= form.select(:user_id, User.all.collect {|user| [user.display_name, user.id] }) %>
+  </p>
+  <p>
+    <%= form.label :netaddr, 'ネットワークアドレス' %><br />
+    <%= form.text_field :netaddr %>
+  </p>
+  <p>
+    <%= form.label :netmask, 'ネットワークマスク' %><br />
+    <%= form.text_field :netmask %>
+  </p>

@@ -1,0 +1,21 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  user: 
+  hostname: MyString
+  mac_address: MyString
+  ipv4_addr: MyString
+  ipv6_addr: MyString
+  location: 
+  description: MyString
+  deleted_at: 2010-03-20 22:21:17
+
+two:
+  user: 
+  hostname: MyString
+  mac_address: MyString
+  ipv4_addr: MyString
+  ipv6_addr: MyString
+  location: 
+  description: MyString
+  deleted_at: 2010-03-20 22:21:17

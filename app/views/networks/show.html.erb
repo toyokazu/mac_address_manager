@@ -1,0 +1,18 @@
+<p>
+  <b>管理者:</b>
+  <%=h @network.user.display_name %>
+</p>
+
+<p>
+  <b>ネットワークアドレス:</b>
+  <%=h @network.netaddr %>
+</p>
+
+<p>
+  <b>ネットワークマスク:</b>
+  <%=h @network.netmask %>
+</p>
+
+
+<%= link_to '編集', edit_network_path(@network) %> |
+<%= link_to '戻る', networks_path %>

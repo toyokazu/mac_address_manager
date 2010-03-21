@@ -1,0 +1,13 @@
+<h1>設置場所の編集</h1>
+
+<% form_for(@location) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+    <%= f.submit '更新' %>
+  </p>
+<% end %>
+
+<%= link_to '詳細', @location %> |
+<%= link_to '戻る', locations_path %>

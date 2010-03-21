@@ -1,0 +1,29 @@
+  <p>
+    <%= form.label :group_id, '管理グループ' %><br />
+    <%= h @mac_address.group.display_name %>
+    <%= form.hidden_field :group_id %>
+  </p>
+  <p>
+    <%= form.label :hostname, 'ホスト名' %><br />
+    <%= form.text_field :hostname %>
+  </p>
+  <p>
+    <%= form.label :mac_addr, 'MACアドレス (例: 11:22:33:44:55:66)' %><br />
+    <%= form.text_field :mac_addr %>
+  </p>
+  <p>
+    <%= form.label :ipv4_addr, 'IPv4アドレス (例: 100.120.130.140)' %><br />
+    <%= form.text_field :ipv4_addr %>
+  </p>
+  <p>
+    <%= form.label :ipv6_addr, 'IPv6アドレス' %><br />
+    <%= form.text_field :ipv6_addr %>
+  </p>
+  <p>
+    <%= form.label :location, '設置場所' %><br />
+    <%= form.select(:location_id, Location.all.collect {|location| [location.description, location.id] }) %>
+  </p>
+  <p>
+    <%= form.label :description, '備考' %><br />
+    <%= form.text_field :description %>
+  </p>

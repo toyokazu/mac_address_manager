@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  user: 
+  netaddr: MyString
+  netmask: 1
+
+two:
+  user: 
+  netaddr: MyString
+  netmask: 1

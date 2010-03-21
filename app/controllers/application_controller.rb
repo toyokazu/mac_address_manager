@@ -7,4 +7,36 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
+  layout "layout"
+
+  def authorized?
+    @current_user ||= User.first(:conditions => {:name => session[:cas_user]})
+    !@current_user.nil?
+  end
+
+  def admin_user?
+    @admin_user ||= @current_user.roles.any? {|role| role.name == 'admin'}
+  end
+
+  def current_user
+    @current_user
+  end
+
+  def redirect_back_or_default
+    redirect_to(request.referer || root_path)
+  end
+
+  def authorize
+    if !authorized?
+      flash[:notice] = "You are not authorized to view this page."
+      redirect_back_or_default and return
+    end
+  end
+
+  def check_admin
+    if !admin_user?
+      flash[:notice] = "This page requires admin role."
+      redirect_back_or_default and return
+    end
+  end
 end

@@ -1,0 +1,22 @@
+<h1>ロール編集</h1>
+
+<% form_for(@role) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+    <% @user_ids = params[:users] || @role.user_ids %>
+    <% @users = User.all %>
+    <%= label_tag :users, 'メンバー' %><br />
+    <% @users.each do |user| %>
+      <%= check_box_tag 'role[user_ids][]', user.id, @user_ids.include?(user.id) %><%= h user.display_name %><br />
+    <% end %>
+  </p>
+
+  <p>
+    <%= f.submit '更新' %>
+  </p>
+<% end %>
+
+<%= link_to '詳細', @role %> |
+<%= link_to '戻る', roles_path %>

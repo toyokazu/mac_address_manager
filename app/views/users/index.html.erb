@@ -1,0 +1,23 @@
+<h1>ユーザ一覧</h1>
+
+<table>
+  <tr>
+    <th>ログインID</th>
+    <th>表示名</th>
+    <th colspan=3></th>
+  </tr>
+
+<% @users.each do |user| %>
+  <tr>
+    <td><%=h user.name %></td>
+    <td><%=h user.display_name %></td>
+    <td><%= link_to '詳細', user %></td>
+    <td><%= link_to '編集', edit_user_path(user) %></td>
+    <td><%= link_to '削除', user, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to '新規ユーザ登録', new_user_path %>

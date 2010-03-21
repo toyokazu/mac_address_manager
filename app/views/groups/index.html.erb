@@ -1,0 +1,23 @@
+<h1>グループ一覧</h1>
+
+<table>
+  <tr>
+    <th>管理者</th>
+    <th>グループ名</th>
+    <th colspan=3></th>
+  </tr>
+
+<% @groups.each do |group| %>
+  <tr>
+    <td><%=h (group.user.nil?)? '' : group.user.display_name %></td>
+    <td><%=h group.display_name %></td>
+    <td><%= link_to '詳細', group %></td>
+    <td><%= link_to '編集', edit_group_path(group) %></td>
+    <td><%= link_to '削除', group, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to '新規グループ作成', new_group_path %>

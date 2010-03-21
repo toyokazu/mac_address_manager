@@ -1,0 +1,22 @@
+<p>
+  <b>ログインID:</b>
+  <%=h @user.name %>
+</p>
+
+<p>
+  <b>表示名:</b>
+  <%=h @user.display_name %>
+</p>
+
+<p>
+  <b>連絡先:</b>
+  <%=h @user.contact %>
+</p>
+
+<p>
+  <b>デフォルトグループ:</b>
+  <%=h @user.default_group.display_name %>
+</p>
+
+<%= link_to '編集', edit_user_path(@user) %> |
+<%= link_to '戻る', users_path %>

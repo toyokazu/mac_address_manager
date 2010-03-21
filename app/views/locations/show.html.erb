@@ -1,0 +1,13 @@
+<p>
+  <b>設置場所:</b>
+  <%=h @location.description %>
+</p>
+
+<p>
+  <b>ネットワーク機器:</b>
+  <%=h @location.hostname %>
+</p>
+
+
+<%= link_to '編集', edit_location_path(@location) %> |
+<%= link_to '戻る', locations_path %>
