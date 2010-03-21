@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>MACアドレスフィルタ管理システム</title>
+  <%= stylesheet_link_tag 'scaffold' %>
+</head>
+<body>
+
+  <div class="frame">
+    <div class="header">
+      <% if session[:cas_user].nil? %>
+        <%= link_to("ログイン", CASClient::Frameworks::Rails::Filter.login_url(controller)) %>
+      <% else %>
+        <%= h session[:cas_user] %>|<%= link_to 'ログアウト', :controller => 'root', :action => 'logout' %>
+      <% end %>
+    </div>
+
+    <div class="main">
+      <div class="contents">
+        <p style="color: green"><%= flash[:notice] %></p>
+        <%= yield %>
+      </div>
+
+      <div class="sidebar">
+        <% if controller.authorized? %>
+          <ul>
+            <li><%= link_to 'ユーザ一覧', users_path %></li>
+            <li><%= link_to 'グループ一覧', groups_path %></li>
+          <% if controller.admin_user? %>
+            <li><%= link_to 'ロール一覧', roles_path %></li>
+          <% end %>
+            <li><%= link_to '設置場所一覧', locations_path %></li>
+            <li><%= link_to 'IPアドレス割当一覧', networks_path %></li>
+            <li><%= link_to 'MACアドレス一覧', mac_addresses_path %></li>
+          </ul>
+        <% end %>
+      </div>
+
+      <div class="clear"><hr/></div>
+    </div>
+
+    <div class="footer">
+      <%= link_to 'Top ページ', :controller => 'root' %>
+    </div>
+  </div>
+
+</body>
+</html>
