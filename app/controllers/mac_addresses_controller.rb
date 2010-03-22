@@ -19,7 +19,7 @@ class MacAddressesController < ApplicationController
     begin
       @mac_address = MacAddress.find(params[:id], gen_cond)
     rescue ActiveRecord::RecordNotFound => error
-      flash[:notice] = 'Specified record was not found.'
+      flash[:notice] = 'You do not have a permission.'
       redirect_back_or_default and return
     end
 
@@ -45,7 +45,7 @@ class MacAddressesController < ApplicationController
     begin
       @mac_address = MacAddress.find(params[:id], gen_cond)
     rescue ActiveRecord::RecordNotFound => error
-      flash[:notice] = 'Specified record was not found.'
+      flash[:notice] = 'You do not have a permission.'
       redirect_back_or_default and return
     end
   end
@@ -73,7 +73,7 @@ class MacAddressesController < ApplicationController
     begin
       @mac_address = MacAddress.find(params[:id], gen_cond)
     rescue ActiveRecord::RecordNotFound => error
-      flash[:notice] = 'Specified record was not found.'
+      flash[:notice] = 'You do not have a permission.'
       redirect_back_or_default and return
     end
 
@@ -95,7 +95,7 @@ class MacAddressesController < ApplicationController
     begin
       @mac_address = MacAddress.find(params[:id], gen_cond)
     rescue ActiveRecord::RecordNotFound => error
-      flash[:notice] = 'Specified record was not found.'
+      flash[:notice] = 'You do not have a permission.'
       redirect_back_or_default and return
     end
     @mac_address.destroy

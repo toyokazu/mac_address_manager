@@ -39,7 +39,12 @@ class GroupsController < ApplicationController
 
   # GET /groups/1/edit
   def edit
-    @group = Group.find(params[:id])
+    begin
+      @group = Group.find(params[:id], gen_cond)
+    rescue ActiveRecord::RecordNotFound => error
+      flash[:notice] = 'You do not have a permission.'
+      redirect_back_or_default and return
+    end
   end
 
   # POST /groups
@@ -62,7 +67,12 @@ class GroupsController < ApplicationController
   # PUT /groups/1
   # PUT /groups/1.xml
   def update
-    @group = Group.find(params[:id])
+    begin
+      @group = Group.find(params[:id], gen_cond)
+    rescue ActiveRecord::RecordNotFound => error
+      flash[:notice] = 'You do not have a permission.'
+      redirect_back_or_default and return
+    end
 
     respond_to do |format|
       if @group.update_attributes(params[:group])
@@ -90,5 +100,10 @@ class GroupsController < ApplicationController
       format.html { redirect_to(groups_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def gen_cond
+    return {} if admin_user?
+    {:conditions => {:user_id => current_user.id}}
   end
 end

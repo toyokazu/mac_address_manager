@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_filter CASClient::Frameworks::Rails::Filter
   before_filter :authorize
-  before_filter :check_admin, :except => [:index, :show]
+  before_filter :check_admin, :except => [:index, :show, :edit]
 
   # GET /users
   # GET /users.xml
@@ -25,15 +25,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # GET /users/select
-  def select
-    @user = User.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-    end
-  end
-
   # GET /users/new
   # GET /users/new.xml
   def new
@@ -47,7 +38,12 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.find(params[:id])
+    begin
+      @user = User.find(params[:id], gen_cond)
+    rescue ActiveRecord::RecordNotFound => error
+      flash[:notice] = 'You do not have a permission.'
+      redirect_back_or_default and return
+    end
   end
 
   # POST /users
@@ -70,7 +66,12 @@ class UsersController < ApplicationController
   # PUT /users/1
   # PUT /users/1.xml
   def update
-    @user = User.find(params[:id])
+    begin
+      @user = User.find(params[:id], gen_cond)
+    rescue ActiveRecord::RecordNotFound => error
+      flash[:notice] = 'You do not have a permission.'
+      redirect_back_or_default and return
+    end
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
@@ -94,5 +95,10 @@ class UsersController < ApplicationController
       format.html { redirect_to(users_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def gen_cond
+    return {} if admin_user?
+    {:conditions => {:id => current_user.id}}
   end
 end

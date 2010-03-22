@@ -11,6 +11,7 @@
   <% @users.each do |user| %>
     <%= check_box_tag 'group[user_ids][]', user.id, @user_ids.include?(user.id), :disabled => (user.id == @group.user_id) %><%= h user.display_name %><br />
   <% end %>
+  <%= hidden_field_tag 'group[user_ids][]', @group.user_id %>
   </p>
   <p>
     <%= f.submit '更新' %>

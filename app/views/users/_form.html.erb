@@ -1,6 +1,10 @@
   <p>
     <%= form.label :name, 'ログインID' %><br />
+    <% if controller.current_user.id == @user.id %>
+    <%= h @user.name %>
+    <% else %>
     <%= form.text_field :name %>
+    <% end %>
   </p>
   <p>
     <%= form.label :display_name, '表示名' %><br />

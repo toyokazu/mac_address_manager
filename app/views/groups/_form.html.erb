@@ -1,6 +1,10 @@
   <p>
     <%= form.label :user, '管理者' %><br />
+    <% if controller.current_user.id == @group.user_id %>
+    <%= h @group.user.display_name %>
+    <% else %>
     <%= form.select(:user_id, User.all.collect {|user| [user.display_name, user.id] }, {:include_blank => true}) %>
+    <% end %>
   </p>
   <p>
     <%= form.label :display_name, 'グループ名' %><br />
