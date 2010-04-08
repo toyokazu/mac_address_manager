@@ -6,6 +6,8 @@ class RootController < ApplicationController
   end
 
   def logout
+    @admin_user = nil
+    @current_user = nil
     CASClient::Frameworks::Rails::Filter.logout(self, request.referer) and return
   end
 
