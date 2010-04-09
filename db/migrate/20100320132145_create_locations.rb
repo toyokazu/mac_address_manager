@@ -3,6 +3,8 @@ class CreateLocations < ActiveRecord::Migration
     create_table :locations do |t|
       t.string :description
       t.string :hostname
+      t.string :ipv4_addr
+      t.string :ipv6_addr
 
       t.timestamps
     end
