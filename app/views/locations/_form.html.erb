@@ -15,3 +15,11 @@
     <%= form.label :ipv6_addr, 'ホスト名' %><br />
     <%= form.text_field :ipv6_addr %>
   </p>
+  <p>
+    <%= form.label :register_dns, 'DNSへの登録' %><br />
+    <%= form.select :register_dns, [["登録する", true], ["登録しない", false]] %>
+  </p>
+  <p>
+    <%= form.label :selectable, '接続先候補' %><br />
+    <%= form.select :selectable, [["含める", true], ["含めない", false]] %>
+  </p>

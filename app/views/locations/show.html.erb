@@ -4,10 +4,27 @@
 </p>
 
 <p>
-  <b>ネットワーク機器:</b>
-  <%=h @location.hostname %>
+<b>ネットワーク機器:</b><br/>
+<p>
+ホスト名: <%=h @location.hostname %>
+</p>
+<p>
+IPv4 アドレス: <%=h @location.ipv4_addr %>
+</p>
+<p>
+IPv6 アドレス: <%=h @location.ipv6_addr %>
+</p>
 </p>
 
+<p>
+  <b>DNSへの登録:</b>
+  <%=h @location.register_dns ? '登録する' : '登録しない' %>
+</p>
+
+<p>
+  <b>接続先候補:</b>
+  <%=h @location.register_dns ? '含めない' : '含める' %>
+</p>
 
 <%= link_to '編集', edit_location_path(@location) %> |
 <%= link_to '戻る', locations_path %>
