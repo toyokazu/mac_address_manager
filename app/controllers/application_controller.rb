@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
-  layout "layout"
 
   def authorized?
     @current_user ||= User.first(:conditions => {:name => session[:cas_user]})

@@ -4,24 +4,37 @@
     <%= form.hidden_field :group_id %>
   </p>
   <p>
+    <%= form.label :mac_addr, 'MACアドレス (例: 11:22:33:44:55:66)' %><br />
+    <% if @mac_address.mac_addr.nil? %>
+    <%= form.text_field :mac_addr %>
+    <% else %>
+    <%= h @mac_address.mac_addr %>
+    <% end %>
+  </p>
+  <p>
     <%= form.label :hostname, 'ホスト名' %><br />
     <%= form.text_field :hostname %>
   </p>
   <p>
-    <%= form.label :mac_addr, 'MACアドレス (例: 11:22:33:44:55:66)' %><br />
-    <%= form.text_field :mac_addr %>
-  </p>
-  <p>
     <%= form.label :ipv4_addr, 'IPv4アドレス (例: 100.120.130.140)' %><br />
-    <%= form.text_field :ipv4_addr %>
+    <% if @mac_address.ipv4_addr.nil? %>
+    空アドレスが自動割り当てされます．
+    <% else %>
+    <%= h @mac_address.ipv4_addr %>
+    <% end %>
   </p>
   <p>
     <%= form.label :ipv6_addr, 'IPv6アドレス' %><br />
     <%= form.text_field :ipv6_addr %>
   </p>
   <p>
-    <%= form.label :location, '設置場所' %><br />
-    <%= form.select(:location_id, Location.all.collect {|location| [location.description, location.id] }) %>
+    <% @location_ids = params[:locations] || @mac_address.location_ids %>
+    <% @locations = Location.selectable.all %>
+    <%= label_tag :locations, '接続先' %><br />
+    <% @locations.each do |location| %>
+      <%= check_box_tag 'mac_address[location_ids][]', location.id, @location_ids.include?(location.id) %><%= h location.description %><br />
+    <% end %>
+    <%= hidden_field_tag 'mac_address[location_ids][]', @mac_address.location_id %>
   </p>
   <p>
     <%= form.label :description, '備考' %><br />

@@ -1,4 +1,4 @@
-<h1>新規設置場所作成</h1>
+<h1>新規接続先<%=h '(サーバ設置場所)' if controller.admin_user? %>作成</h1>
 
 <% form_for(@location) do |f| %>
   <%= f.error_messages %>

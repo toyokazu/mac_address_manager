@@ -1,6 +1,9 @@
 class MacAddress < ActiveRecord::Base
   belongs_to :group
-  belongs_to :location
+  has_many :location_mac_address_relations
+  has_many :locations, :through => :location_mac_address_relations
+
+  validates_uniqueness_of :mac_addr, :ipv4_addr, :ipv6_addr
 
   def before_save
     if !self.ipv4_addr.empty?
@@ -19,5 +22,10 @@ class MacAddress < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def validate_on_update
+    if self.mac_addr_changed? || self.ipv4_addr_changed?
+    end
   end
 end

@@ -1,21 +1,23 @@
 <p>
-  <b>設置場所:</b>
+  <b>接続先<%=h '(サーバ設置場所)' if controller.admin_user? %>:</b>
   <%=h @location.description %>
 </p>
 
 <p>
-<b>ネットワーク機器:</b><br/>
-<p>
-ホスト名: <%=h @location.hostname %>
+  <b>ネットワーク<%=h '(サーバ)' if controller.admin_user? %>機器:</b><br/>
+  <p>
+    ホスト名: <%=h @location.hostname %>
+  </p>
+<% if controller.admin_user? %>
+  <p>
+    IPv4 アドレス: <%=h @location.ipv4_addr %>
+  </p>
+  <p>
+    IPv6 アドレス: <%=h @location.ipv6_addr %>
+  </p>
+<% end %>
 </p>
-<p>
-IPv4 アドレス: <%=h @location.ipv4_addr %>
-</p>
-<p>
-IPv6 アドレス: <%=h @location.ipv6_addr %>
-</p>
-</p>
-
+<% if controller.admin_user? %>
 <p>
   <b>DNSへの登録:</b>
   <%=h @location.register_dns ? '登録する' : '登録しない' %>
@@ -23,8 +25,9 @@ IPv6 アドレス: <%=h @location.ipv6_addr %>
 
 <p>
   <b>接続先候補:</b>
-  <%=h @location.register_dns ? '含めない' : '含める' %>
+  <%=h @location.selectable ? '含める' : '含めない' %>
 </p>
+<% end %>
 
 <%= link_to '編集', edit_location_path(@location) %> |
 <%= link_to '戻る', locations_path %>
