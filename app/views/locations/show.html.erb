@@ -10,6 +10,9 @@
   </p>
 <% if controller.admin_user? %>
   <p>
+    ホストの種類: <%=h @location.hosttype %>
+  </p>
+  <p>
     IPv4 アドレス: <%=h @location.ipv4_addr %>
   </p>
   <p>

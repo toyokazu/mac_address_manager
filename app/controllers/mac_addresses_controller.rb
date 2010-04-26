@@ -10,6 +10,7 @@ class MacAddressesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @mac_addresses }
+      format.yml  { render :yml => @mac_addresses }
     end
   end
 

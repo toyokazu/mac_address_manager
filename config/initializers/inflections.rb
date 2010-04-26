@@ -8,3 +8,6 @@
 #   inflect.irregular 'person', 'people'
 #   inflect.uncountable %w( fish sheep )
 # end
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.singular /^([Aa])presia/, '\1presia'
+end

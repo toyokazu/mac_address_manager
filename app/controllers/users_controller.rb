@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_filter CASClient::Frameworks::Rails::Filter
   before_filter :authorize
-  before_filter :check_admin, :except => [:index, :show, :edit]
+  before_filter :check_admin, :except => [:index, :show, :edit, :update]
 
   # GET /users
   # GET /users.xml

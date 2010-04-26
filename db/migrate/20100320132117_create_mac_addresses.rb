@@ -12,15 +12,11 @@ class CreateMacAddresses < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :mac_addresses, :mac_addr, :unique => true
-    add_index :mac_addresses, :ipv4_addr, :unique => true
-    add_index :mac_addresses, :ipv6_addr, :unique => true
+    MacAddress.create_versioned_table
   end
 
   def self.down
-    remove_index :mac_addresses, :ipv6_addr
-    remove_index :mac_addresses, :ipv4_addr
-    remove_index :mac_addresses, :mac_addr
+    MacAddress.drop_versioned_table
     drop_table :mac_addresses
   end
 end

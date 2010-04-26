@@ -5,11 +5,7 @@
   </p>
   <p>
     <%= form.label :mac_addr, 'MACアドレス (例: 11:22:33:44:55:66)' %><br />
-    <% if @mac_address.mac_addr.nil? %>
     <%= form.text_field :mac_addr %>
-    <% else %>
-    <%= h @mac_address.mac_addr %>
-    <% end %>
   </p>
   <p>
     <%= form.label :hostname, 'ホスト名' %><br />
@@ -17,11 +13,7 @@
   </p>
   <p>
     <%= form.label :ipv4_addr, 'IPv4アドレス (例: 100.120.130.140)' %><br />
-    <% if @mac_address.ipv4_addr.nil? %>
-    空アドレスが自動割り当てされます．
-    <% else %>
-    <%= h @mac_address.ipv4_addr %>
-    <% end %>
+    <%= form.text_field :ipv4_addr %>
   </p>
   <p>
     <%= form.label :ipv6_addr, 'IPv6アドレス' %><br />

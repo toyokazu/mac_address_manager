@@ -6,7 +6,7 @@ class LocationsController < ApplicationController
   # GET /locations
   # GET /locations.xml
   def index
-    @locations = Location.all
+    @locations = Location.all(gen_cond)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -17,7 +17,7 @@ class LocationsController < ApplicationController
   # GET /locations/1
   # GET /locations/1.xml
   def show
-    @location = Location.find(params[:id])
+    @location = Location.find(params[:id], gen_cond)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -85,5 +85,10 @@ class LocationsController < ApplicationController
       format.html { redirect_to(locations_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def gen_cond
+    return {} if admin_user?
+    {:conditions => {:selectable => true}}
   end
 end

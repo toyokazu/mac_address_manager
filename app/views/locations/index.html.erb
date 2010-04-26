@@ -4,6 +4,9 @@
   <tr>
     <th>接続先<%=h '(サーバ設置場所)' if controller.admin_user? %></th>
     <th>ネットワーク<%=h '(サーバ)' if controller.admin_user? %>機器</th>
+    <% if controller.admin_user? %>
+    <th>ネットワーク (サーバ) 機器の種類</th>
+    <% end %>
     <th colspan=3></th>
   </tr>
 
@@ -11,6 +14,9 @@
   <tr>
     <td><%=h location.description %></td>
     <td><%=h location.hostname %></td>
+    <% if controller.admin_user? %>
+    <td><%=h location.hosttype %></td>
+    <% end %>
     <td><%= link_to '詳細', location %></td>
     <td><%= link_to '編集', edit_location_path(location) %></td>
     <td><%= link_to '削除', location, :confirm => 'Are you sure?', :method => :delete %></td>
