@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
     self.save
   end
 
-  def before_save
+  def before_update
     if !self.groups.include?(self.default_group)
       errors.add(:default_group, "You are not a member of the specified default_group.")
       return false

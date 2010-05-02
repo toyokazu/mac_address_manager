@@ -43,4 +43,4 @@ end
 require 'casclient'
 require 'casclient/frameworks/rails/filter'
 # change :cas_base_url to your CAS server
-CASClient::Frameworks::Rails::Filter.configure(:cas_base_url => "https://localhost.localdomain:8443/")
+CASClient::Frameworks::Rails::Filter.configure(:cas_base_url => "https://localhost:8443/")
