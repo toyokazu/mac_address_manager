@@ -10,7 +10,7 @@ class MacAddressesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @mac_addresses }
-      format.yml  { render :yml => @mac_addresses }
+      format.json  { render :json => @mac_addresses.to_json(:except => [:id, :created_at, :updated_at, :deleted_at, :group_id, :version]) }
     end
   end
 
