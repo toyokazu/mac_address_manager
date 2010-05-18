@@ -38,4 +38,6 @@
 
 <br />
 
-<%= link_to '新規MACアドレス登録', new_mac_address_path %>
+<%= link_to '新規MACアドレス登録', new_mac_address_path %><br/>
+<%= link_to 'CSVファイルのダウンロード', mac_addresses_path + ".csv" %><br/>
+<%= link_to 'CSVファイルによる一括登録・更新', upload_mac_addresses_path %>

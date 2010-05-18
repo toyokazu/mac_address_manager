@@ -1,3 +1,4 @@
+require 'csv'
 class MacAddressesController < ApplicationController
   before_filter CASClient::Frameworks::Rails::Filter
   before_filter :authorize
@@ -10,7 +11,14 @@ class MacAddressesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @mac_addresses }
-      format.json  { render :json => @mac_addresses.to_json(:except => [:id, :created_at, :updated_at, :deleted_at, :group_id, :version]) }
+      format.csv do
+        CSV::Writer.generate(output = "", "\t") do |csv|
+          @mac_addresses.each do |mac_addr|
+            csv << [mac_addr.hostname, mac_addr.mac_addr, mac_addr.description]
+          end
+        end
+        send_data(output, :type => 'text/csv')
+      end
     end
   end
 
@@ -41,6 +49,13 @@ class MacAddressesController < ApplicationController
     end
   end
 
+  # GET /mac_addresses/upload
+  def upload
+    respond_to do |format|
+      format.html # upload.html.erb
+    end
+  end
+
   # GET /mac_addresses/1/edit
   def edit
     begin
@@ -65,6 +80,20 @@ class MacAddressesController < ApplicationController
         format.html { render :action => "new" }
         format.xml  { render :xml => @mac_address.errors, :status => :unprocessable_entity }
       end
+    end
+  end
+
+  # POST /mac_addresses/update_all
+  def update_all
+    # TO BE IMPLEMENTED
+    #render :text => "<pre>" + params[:file][:csv].read + "</pre>"
+    client = Rinda::Client.new('update')
+    client.worker.lock(current_user.default_group.id)
+    client.update_and_unlock_request(current_user.default_group.id, params[:file][:csv])
+
+    respond_to do |format|
+      format.html { redirect_to(root_path) }
+      format.xml  { render :xml => :ok }
     end
   end
 
