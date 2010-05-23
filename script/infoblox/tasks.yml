@@ -3,12 +3,12 @@
 - - fixed_addr
   - - create
     - 11:22:33:44:55:66
-    - 133.101.56.1
+    - 133.101.1.1
     - This is comment.
 - - host_record
   - - create
     - nameex01
-    - 133.101.56.1
+    - 133.101.1.1
     - - alias01
       - alias02
     - This is comment.

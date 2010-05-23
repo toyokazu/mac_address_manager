@@ -1,7 +1,7 @@
 # server: hostname or IP address of Infoblox
 # username: Infoblox admin user name
 # password: Infoblox admin user password
-server: 133.101.56.64
+server: test
 username: test
 password: test
 
