@@ -1,0 +1,15 @@
+<h1>MACアドレスの一括更新</h1>
+
+CSVファイルをアップロードすることで一括登録・更新できます．<br/>
+<ul>
+  <li>新規にCSVファイルに追加したエントリは，DBに新規登録されます．</li>
+  <li>CSVファイルに存在し，DB上にも既に存在するエントリは，上書き更新されます．</li>
+  <li>CSVファイルから削除されたエントリは，DB上から削除されます．</li>
+</ul>
+
+<% form_tag update_all_mac_addresses_path, {:method => :post, :multipart => true} do %>
+<%= file_field :file, :csv %>
+<%= submit_tag '更新' %>
+<% end %>
+
+<%= link_to '戻る', mac_addresses_path %>
