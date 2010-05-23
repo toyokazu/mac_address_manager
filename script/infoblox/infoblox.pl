@@ -31,6 +31,9 @@ if ($manager->start_session == -1) {
 my $tasks = LoadFile($opt_f || $directory . "/tasks.yml");
 # process tasks
 foreach (@{$tasks}) {
-  $manager->$_->[0](@{$_->[1]})
+  # FIXME
+  my $method = $_->[0];
+  my $args = $_->[1];
+  $manager->$method(@{$args})
 }
 
