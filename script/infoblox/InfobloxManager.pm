@@ -91,13 +91,13 @@ sub find_host_record {
   my ($hostname, $ipv4_addr) = @_;
   my @host_records;
   if ($hostname != undef) {
-    @host_records = $self->{session}->get(
+    @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
       name => $hostname,
       view => "default"
     );
   } elsif ($ipv4_addr != undef) {
-    @host_records = $self->{session}->get(
+    @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
       ipv4addr => $ipv4_addr,
       view => "default"
