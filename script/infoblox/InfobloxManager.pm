@@ -89,7 +89,7 @@ sub fixed_addr {
 sub find_host_record {
   my $self = shift;
   my ($hostname, $ipv4_addr) = @_;
-  my @host_records = undef;
+  my @host_records = ();
   if ($hostname ne undef) {
     @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
