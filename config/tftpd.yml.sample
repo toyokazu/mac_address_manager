@@ -1,0 +1,6 @@
+# user: username to start tftpd server
+# path: chroot directory of the tftpd server
+# default_addr: default interface to listen
+user:
+path:
+default_addr:
