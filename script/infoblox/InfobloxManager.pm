@@ -32,6 +32,22 @@ sub start_session {
   print "Session (", $self->{server}, ") created successfully\n";
 }
 
+sub find_fixed_addr {
+  my $self = shift;
+  my ($mac_addr) = @_;
+  my @fixed_addrs = $self->{session}->get(
+    object => "Infoblox::DHCP::FixedAddr",
+    mac => $mac_addr,
+  );
+  if ($#fixed_addrs == -1) {
+    print("Cannot find any fixed_addr for updating with specified MAC address.\n");
+    return -1;
+  }
+  print "Fixed Address\n";
+  print "ipv4addr: " . $fixed_addrs[0]->ipv4addr . "\n";
+  print "comment: " . $fixed_addrs[0]->comment . "\n";
+}
+
 sub fixed_addr {
   my $self = shift;
   my ($operation, $mac_addr, $ipv4_addr, $comment) = @_;
@@ -70,6 +86,37 @@ sub fixed_addr {
   }
 }
 
+sub find_host_record {
+  my $self = shift;
+  my ($hostname, $ipv4_addr) = @_;
+  my @host_records;
+  if ($hostname != undef) {
+    @host_records = $self->{session}->get(
+      object => "Infoblox::DNS::Host",
+      name => $hostname,
+      view => "default"
+    );
+  } elsif ($ipv4_addr != undef) {
+    @host_records = $self->{session}->get(
+      object => "Infoblox::DNS::Host",
+      ipv4addr => $ipv4_addr,
+      view => "default"
+    );
+  }
+  if ($#host_records == -1) {
+    print("Cannot find any host_record for updating with specified hostname or IPv4 address.\n");
+    return -1;
+  }
+  print "Host Record:\n";
+  print $host_records[0] . "\n";
+  print "hostname: " . $host_records[0]->name . "\n";
+  print "ipv4addr: " . $host_records[0]->ipv4addr . "\n";
+  foreach my $alias ($host_records[0]->aliases) {
+    print "aliases: " . $alias . "\n";
+  }
+  print "comment: " . $host_records[0]->comment . "\n";
+}
+
 sub host_record {
   my $self = shift;
   my ($operation, $hostname, $ipv4_addr, $aliases, $comment) = @_;
@@ -91,7 +138,7 @@ sub host_record {
       $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
   } elsif ($operation == 'update') { # Update
     if ($#host_records == -1) {
-      print("Cannot find any host_record for updating with specified MAC address.\n");
+      print("Cannot find any host_record for updating with specified hostname.\n");
       return -1;
     }
     $host_records[0]->name($hostname);
