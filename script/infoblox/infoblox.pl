@@ -34,7 +34,7 @@ if ($manager->start_session == -1) {
 }
 
 if ($opt_F) {
-  $manager->find_fixed_addr($opt_m);
+  $manager->find_fixed_addr($opt_m, $opt_i);
   exit;
 }
 if ($opt_H) {

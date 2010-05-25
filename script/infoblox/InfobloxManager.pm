@@ -34,11 +34,19 @@ sub start_session {
 
 sub find_fixed_addr {
   my $self = shift;
-  my ($mac_addr) = @_;
-  my @fixed_addrs = $self->{session}->get(
-    object => "Infoblox::DHCP::FixedAddr",
-    mac => $mac_addr,
-  );
+  my ($mac_addr, $ipv4_addr) = @_;
+  my @fixed_addrs = ();
+  if ($mac_addr ne undef) {
+    @fixed_addrs = $self->{session}->search(
+      object => "Infoblox::DHCP::FixedAddr",
+      mac => $mac_addr,
+    );
+  } elsif ($ipv4_addr ne undef) {
+    @fixed_addrs = $self->{session}->search(
+      object => "Infoblox::DHCP::FixedAddr",
+      ipv4_addr => $ipv4_addr,
+    );
+  }
   if ($#fixed_addrs == -1) {
     print("Cannot find any fixed_addr for updating with specified MAC address.\n");
     return -1;
