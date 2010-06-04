@@ -4,15 +4,6 @@
 use Getopt::Std;
 use YAML::Syck;
 
-our ($opt_f, $opt_F, $opt_h, $opt_H, $opt_i, $opt_m);
-getopt('f:Fh:Hi:m:');
-# f: file name of the task file (task.yml)
-# F: search FixedAddress
-# h: search key (hostname)
-# H: search HostRecord
-# i: search key (IP Address)
-# m: search key (MAC Address)
-
 BEGIN {
   use File::Spec::Functions qw(rel2abs);
   use File::Basename qw(dirname);
@@ -24,6 +15,15 @@ BEGIN {
 use lib $directory;
 use InfobloxManager;
 
+our %opts;
+getopts('f:Fh:Hi:m:', \%opts);
+# f: file name of the task file (task.yml)
+# F: search FixedAddress
+# h: search key (hostname)
+# H: search HostRecord
+# i: search key (IP Address)
+# m: search key (MAC Address)
+
 # read config
 my $config = LoadFile($directory . "/config.yml");
 
@@ -33,12 +33,12 @@ if ($manager->start_session == -1) {
   die("An error occurred during session creation.");
 }
 
-if ($opt_F) {
-  $manager->find_fixed_addr($opt_m, $opt_i);
+if ($opts{"F"}) {
+  $manager->find_fixed_addr($opts{"m"}, $opts{"i"});
   exit;
 }
-if ($opt_H) {
-  $manager->find_host_record($opt_h, $opt_i);
+if ($opts{"H"}) {
+  $manager->find_host_record($opts{"h"}, $opts{"i"});
   exit;
 }
 
