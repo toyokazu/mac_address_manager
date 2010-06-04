@@ -48,7 +48,7 @@ sub find_fixed_addr {
     );
   }
   if ($#fixed_addrs == -1) {
-    print("Cannot find any fixed_addr for updating with specified MAC address.\n");
+    print("Cannot find any fixed_addr for updating with specified MAC or IP address.\n");
     return -1;
   }
   print "Fixed Address\n";
