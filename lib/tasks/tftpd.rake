@@ -12,6 +12,7 @@ namespace :tftpd do
       @config = YAML.load_file("#{RAILS_ROOT}/config/tftpd.yml")
       @user = @config["user"] || `/usr/bin/env id -un`.strip
       @path = @config["path"] || "#{RAILS_ROOT}/tmp/tftproot"
+      @default_addr = @config["default_addr"]
     rescue => error
       output_error(error, "reading configuration file")
     end
@@ -29,7 +30,10 @@ namespace :tftpd do
   desc "start tftpd"
   task :start => :config do
     begin
-      @start_tftpd = "/usr/bin/sudo /usr/bin/env tftpd -v -c -u #{@user} -l -s #{@path}"
+      @start_tftpd = "/usr/bin/sudo /usr/bin/env tftpd -v -c -u #{@user} -l #{"-a #{@default_addr}" if !@default_addr.nil?} -s #{@path}"
+#      if !@default_addr.nil?
+#        @start_tftpd = "#{@start_tftpd} -a #{@default_addr}"
+#      end
       puts @start_tftpd
       system @start_tftpd
     rescue => error

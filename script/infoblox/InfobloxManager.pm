@@ -67,7 +67,7 @@ sub fixed_addr {
     object => "Infoblox::DHCP::FixedAddr",
     mac => $mac,
   );
-  if ($operation == 'create' && $#fixed_addrs == -1) { # Create
+  if ($operation eq 'create' && $#fixed_addrs == -1) { # Create
     my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
       mac => $mac,
       ipv4addr => $ipv4addr,
@@ -76,7 +76,7 @@ sub fixed_addr {
     my $response = $self->{session}->add($fixed_addr)
       or print("Create new fixed_addr failed: ",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
-  } elsif ($operation == 'update') { # Update
+  } elsif ($operation eq 'update') { # Update
     if ($#fixed_addrs == -1) {
       print("Cannot find any fixed_addr for updating with specified MAC address.\n");
       return -1;
@@ -86,7 +86,7 @@ sub fixed_addr {
     my $response = $self->{session}->modify($fixed_addrs[0])
       or print("Modify fixed_addr (", $fixed_addrs[0]->mac,") failed: ",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
-  } elsif ($operation == 'delete') { # Delete
+  } elsif ($operation eq 'delete') { # Delete
     if ($#fixed_addrs == -1) {
       print("Cannot find any fixed_addr for deleting with specified MAC address.\n");
       return -1;
@@ -104,14 +104,12 @@ sub find_host_record {
   if ($name ne undef) {
     @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
-      name => $name,
-      view => "default"
+      name => $name
     );
   } elsif ($ipv4addr ne undef) {
     @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
-      ipv4addr => $ipv4addr,
-      view => "default"
+      ipv4addr => $ipv4addr
     );
   }
   if ($#host_records == -1) {
@@ -121,9 +119,19 @@ sub find_host_record {
   print "Host Records:\n";
   foreach my $host_record (@host_records) {
     print "name: " . $host_record->name . "\n";
-    print "ipv4addr: " . $host_record->ipv4addrs . "\n";
-    foreach my $alias ($host_record->aliases) {
-      print "aliases: " . $alias . "\n";
+    print "ipv4addr:\n";
+    foreach my $ipv4addr (@{$host_record->ipv4addrs}) {
+      if (ref($ipv4addr) eq "Infoblox::DHCP::FixedAddr") {
+        print "  ipv4addr: " . $ipv4addr->ipv4addr . "\n";
+        print "  mac: " . $ipv4addr->mac . "\n";
+        print "  comment: " . $ipv4addr->comment . "\n";
+      } else {
+        print "  " . $ipv4addr . "\n";
+      }
+    }
+    print "aliases:\n";
+    foreach my $alias (@{$host_record->aliases}) {
+      print "  " . $alias . "\n";
     }
     print "comment: " . $host_record->comment . "\n";
   }
@@ -134,36 +142,37 @@ sub host_record {
   my ($operation, $name, $ipv4addr, $mac, $aliases, $comment) = @_;
   my @host_records = $self->{session}->get(
     object => "Infoblox::DNS::Host",
-    name => $name,
-    view => "default"
+    name => $name
   );
-  if ($operation == 'create' && $#host_records == -1) { # Create
+  if ($operation eq 'create' && $#host_records == -1) { # Create
     my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
       mac => $mac,
       ipv4addr => $ipv4addr,
       comment => $comment,
+      configure_for_dhcp => "true"
     );
     my $host_record = Infoblox::DNS::Host->new(
       name => $name,
-      ipv4addr => [$fixed_addr],
+      ipv4addrs => [$fixed_addr],
       aliases => $aliases,
-      comment => $comment,
-      view => "default"
+      comment => $comment
     );
     my $response = $self->{session}->add($host_record)
       or print("Create new host_record failed: ",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
-  } elsif ($operation == 'update') { # Update
+  } elsif ($operation eq 'update') { # Update
     if ($#host_records == -1) {
       print("Cannot find any host_record for updating with specified hostname.\n");
       return -1;
     }
-    my $fixed_addr = Infoblox::DHCP::FixedAddr->get(
-      ipv4addr => $host_records[0]->ipv4addrs
-    );
-    $fixed_addr->mac($mac);
-    $fixed_addr->ipv4addr($ipv4addr);
-    $fixed_addr->comment($comment);
+    my $fixed_addr = $host_records[0]->ipv4addrs->[0];
+    if (ref($fixed_addr) eq "Infoblox::DHCP::FixedAddr") {
+      $fixed_addr->mac($mac);
+      $fixed_addr->ipv4addr($ipv4addr);
+      $fixed_addr->comment($comment);
+    } else {
+      $fixed_addr = $ipv4addr;
+    }
     $host_records[0]->name($name);
     $host_records[0]->ipv4addrs([$fixed_addr]);
     $host_records[0]->aliases($aliases);
@@ -171,7 +180,7 @@ sub host_record {
     my $response = $self->{session}->modify($host_records[0])
       or print("Modify host_record (", $host_records[0]->name,") failed: ",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail());
-  } elsif ($operation == 'delete') { # Delete
+  } elsif ($operation eq 'delete') { # Delete
     if ($#host_records == -1) {
       print("Cannot find any host_record for deleting with specified MAC address.\n");
       return -1;
