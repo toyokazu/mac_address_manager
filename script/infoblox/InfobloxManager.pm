@@ -48,7 +48,7 @@ sub find_fixed_addr {
     );
   }
   if ($#fixed_addrs == -1) {
-    print("Cannot find any fixed_addr for updating with specified MAC or IP address (" . $mac . "/" . $ipv4addr . ").\n");
+    print("Cannot find any fixed_addr with specified MAC or IP address (" . $mac . "/" . $ipv4addr . ").\n");
     return -1;
   }
   print "Fixed Address\n";
@@ -115,13 +115,13 @@ sub find_host_record {
     );
   }
   if ($#host_records == -1) {
-    print("Cannot find any host_record for updating with specified hostname or IPv4 address.\n");
+    print("Cannot find any host_record with specified hostname or IPv4 address.\n");
     return -1;
   }
   print "Host Records:\n";
   foreach my $host_record (@host_records) {
     print "name: " . $host_record->name . "\n";
-    print "ipv4addr: " . $host_record->ipv4addr . "\n";
+    print "ipv4addr: " . $host_record->ipv4addrs . "\n";
     foreach my $alias ($host_record->aliases) {
       print "aliases: " . $alias . "\n";
     }
@@ -131,16 +131,21 @@ sub find_host_record {
 
 sub host_record {
   my $self = shift;
-  my ($operation, $name, $ipv4addr, $aliases, $comment) = @_;
+  my ($operation, $name, $ipv4addr, $mac, $aliases, $comment) = @_;
   my @host_records = $self->{session}->get(
     object => "Infoblox::DNS::Host",
     name => $name,
     view => "default"
   );
   if ($operation == 'create' && $#host_records == -1) { # Create
+    my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
+      mac => $mac,
+      ipv4addr => $ipv4addr,
+      comment => $comment,
+    );
     my $host_record = Infoblox::DNS::Host->new(
       name => $name,
-      ipv4addr => $ipv4addr,
+      ipv4addr => [$fixed_addr],
       aliases => $aliases,
       comment => $comment,
       view => "default"
@@ -153,8 +158,14 @@ sub host_record {
       print("Cannot find any host_record for updating with specified hostname.\n");
       return -1;
     }
+    my $fixed_addr = Infoblox::DHCP::FixedAddr->get(
+      ipv4addr => $host_records[0]->ipv4addrs
+    );
+    $fixed_addr->mac($mac);
+    $fixed_addr->ipv4addr($ipv4addr);
+    $fixed_addr->comment($comment);
     $host_records[0]->name($name);
-    $host_records[0]->ipv4addr($ipv4addr);
+    $host_records[0]->ipv4addrs([$fixed_addr]);
     $host_records[0]->aliases($aliases);
     $host_records[0]->comment($comment);
     my $response = $self->{session}->modify($host_records[0])

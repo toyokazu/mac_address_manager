@@ -88,7 +88,15 @@ class MacAddressesController < ApplicationController
     # TO BE IMPLEMENTED
     #render :text => "<pre>" + params[:file][:csv].read + "</pre>"
     client = Rinda::Client.new('update')
-    client.worker.lock(current_user.default_group.id)
+    repeat_count = 3
+    until client.worker.lock(current_user.default_group.id)
+      sleep(1)
+      repeat_count = repeat_count - 1
+      if repeat_count == 0
+        flash[:notice] = 'Update daemon seems to be busy now. Please wait a few minutes and try again.'
+        redirect_back_or_default and return
+      end
+    end
     client.update_and_unlock_request(current_user.default_group.id, params[:file][:csv])
 
     respond_to do |format|
