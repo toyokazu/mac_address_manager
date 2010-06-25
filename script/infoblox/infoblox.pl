@@ -16,12 +16,13 @@ use lib $directory;
 use InfobloxManager;
 
 our %opts;
-getopts('f:Fh:Hi:m:', \%opts);
+getopts('4:6:f:Fh:Hm:', \%opts);
+# 4: search key (IPv4 Address)
+# 6: search key (IPv6 Address)
 # f: file name of the task file (task.yml)
 # F: search FixedAddress
 # h: search key (hostname)
 # H: search HostRecord
-# i: search key (IP Address)
 # m: search key (MAC Address)
 
 # read config
@@ -34,11 +35,11 @@ if ($manager->start_session == -1) {
 }
 
 if ($opts{"F"}) {
-  $manager->find_fixed_addr($opts{"m"}, $opts{"i"});
+  $manager->find_fixed_addr($opts{"m"}, $opts{"4"}, $opts{"6"});
   exit;
 }
 if ($opts{"H"}) {
-  $manager->find_host_record($opts{"h"}, $opts{"i"});
+  $manager->find_host_record($opts{"h"}, $opts{"4"}, $opts{"6"});
   exit;
 }
 

@@ -4,11 +4,20 @@
   - - create
     - 11:22:33:44:55:66
     - 133.101.1.1
-    - This is comment.
+    - This is comment for test fixed_addr.
 - - host_record
   - - create
     - nameex01
     - 133.101.1.1
+    - 2001:ffff::1
     - - alias01
       - alias02
-    - This is comment.
+    - This is comment for nameex01.
+- - host_record
+  - - create
+    - nameex02
+    - 133.101.1.2
+    - 2001:ffff::2
+    - - alias03
+      - alias04
+    - This is comment for nameex02.

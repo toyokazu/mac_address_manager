@@ -85,8 +85,6 @@ class MacAddressesController < ApplicationController
 
   # POST /mac_addresses/update_all
   def update_all
-    # TO BE IMPLEMENTED
-    #render :text => "<pre>" + params[:file][:csv].read + "</pre>"
     client = Rinda::Client.new('update')
     repeat_count = 3
     until client.worker.lock(current_user.default_group.id)

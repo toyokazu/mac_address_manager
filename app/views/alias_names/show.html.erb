@@ -1,0 +1,17 @@
+<p>
+  <b>MACアドレス:</b>
+  <%=h @alias_name.mac_address.mac_addr %>
+</p>
+
+<p>
+  <b>ホスト名(別名):</b>
+  <%=h @alias_name.hostname %>
+</p>
+
+<p>
+  <b>備考:</b>
+  <%=h @alias_name.description %>
+</p>
+
+<%= link_to '編集', edit_mac_address_alias_name_path(:id => @alias_name.id, :mac_address_id => @alias_name.mac_address_id) %> |
+<%= link_to '戻る', mac_address_path(:id => @alias_name.mac_address_id) %>

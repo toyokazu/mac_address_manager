@@ -3,11 +3,25 @@ class MacAddress < ActiveRecord::Base
   belongs_to :group
   has_many :location_mac_address_relations
   has_many :locations, :through => :location_mac_address_relations
+  has_many :alias_names
 
   acts_as_versioned
   acts_as_paranoid
 
   validates_presence_of :group_id, :hostname, :mac_addr
+
+  named_scope :created_after, lambda {|time|
+    return {} if time.nil?
+    {:conditions => ["created_at > :time and created_at = updated_at", {:time => time}]}
+  }
+  named_scope :updated_after, lambda {|time|
+    return {} if time.nil?
+    {:conditions => ["updated_at > :time and updated_at > created_at", {:time => time}]}
+  }
+  named_scope :deleted_after, lambda {|time|
+    return {} if time.nil?
+    {:conditions => ["deleted_at > :time", {:time => time}]}
+  }
 
   def packed_mac_addr
     self.mac_addr.downcase.gsub(':', '')

@@ -9,6 +9,11 @@
 </p>
 
 <p>
+  <b>ホスト名(別名):</b>
+  <%=h (@mac_address.alias_names.map { |alias_name| alias_name.hostname }).join(',') %> 
+</p>
+
+<p>
   <b>MACアドレス:</b>
   <%=h @mac_address.mac_addr %>
 </p>
@@ -36,4 +41,5 @@
 </p>
 
 <%= link_to '編集', edit_mac_address_path(@mac_address) %> |
+<%= link_to 'ホスト名(別名)一覧', mac_address_alias_names_path(:mac_address_id => @mac_address.id) %> |
 <%= link_to '戻る', mac_addresses_path %>

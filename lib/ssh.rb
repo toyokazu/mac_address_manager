@@ -2,6 +2,10 @@ require 'pty'
 require 'expect'
 module SSH
   class Base
+    def self.get_instance(location)
+      (eval location.hosttype).new
+    end
+
     def initialize
       @config = YAML.load_file("#{RAILS_ROOT}/config/ssh.yml")
     end
@@ -22,7 +26,7 @@ module SSH
       @tftpd_addr = @tftpd_config["default_addr"]
     end
 
-    def upload_mac_list(location)
+    def sync_from_serv_to_switch(location)
       hostname = location.hostname
       ipv4_addr = location.ipv4_addr
       username = @config[classname][hostname][0]
@@ -40,7 +44,7 @@ module SSH
       end
     end
 
-    def download_mac_list(location)
+    def sync_from_switch_to_serv(location)
       hostname = location.hostname
       ipv4_addr = location.ipv4_addr
       username = @config[classname][hostname][0]

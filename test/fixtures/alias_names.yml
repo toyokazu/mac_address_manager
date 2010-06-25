@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  mac_address: 
+  hostname: MyString
+  description: MyString
+  deleted_at: 2010-06-08 10:08:43
+
+two:
+  mac_address: 
+  hostname: MyString
+  description: MyString
+  deleted_at: 2010-06-08 10:08:43

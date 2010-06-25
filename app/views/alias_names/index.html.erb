@@ -1,0 +1,26 @@
+<h1>ホスト名(別名)一覧</h1>
+
+<table>
+  <tr>
+    <th>MACアドレス</th>
+    <th>ホスト名(別名)</th>
+    <th>備考</th>
+    <th colspan=3></th>
+  </tr>
+
+<% @alias_names.each do |alias_name| %>
+  <tr>
+    <td><%=h alias_name.mac_address.mac_addr %></td>
+    <td><%=h alias_name.hostname %></td>
+    <td><%=h alias_name.description %></td>
+    <td><%= link_to('詳細', mac_address_alias_name_path(:id => alias_name.id, :mac_address_id => alias_name.mac_address_id)) %></td>
+    <td><%= link_to('編集', edit_mac_address_alias_name_path(:id => alias_name.id, :mac_address_id => alias_name.mac_address_id)) %></td>
+    <td><%= link_to('削除', mac_address_alias_name_path(:id => alias_name.id, :mac_address_id => alias_name.mac_address.id), :confirm => 'Are you sure?', :method => :delete) %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to '新規ホスト名(別名)登録', new_mac_address_alias_name_path %>|
+<%= link_to '戻る', mac_address_path(:id => @mac_address.id) %><br/>

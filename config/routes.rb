@@ -3,7 +3,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :networks
 
-  map.resources :mac_addresses, :collection => {:upload => :get, :update_all => :post}
+  map.resources :mac_addresses, :collection => {:upload => :get, :update_all => :post} do|mac_address|
+    mac_address.resources :alias_names
+  end
 
   map.resources :groups, :collection => {:edit_users => :get}
 

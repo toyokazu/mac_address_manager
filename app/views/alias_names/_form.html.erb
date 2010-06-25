@@ -1,0 +1,13 @@
+  <p>
+    <%= form.label :mac_address, 'MACアドレス' %><br />
+    <%= h @alias_name.mac_address.mac_addr %>
+    <%= form.hidden_field :mac_address_id %>
+  </p>
+  <p>
+    <%= form.label :hostname, 'ホスト名 (別名)' %><br />
+    <%= form.text_field :hostname %>
+  </p>
+  <p>
+    <%= form.label :description, '備考' %><br />
+    <%= form.text_field :description %>
+  </p>

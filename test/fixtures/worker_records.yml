@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  worker_type: MyString
+  start_at: 2010-06-04 17:19:13
+  end_at: 2010-06-04 17:19:13
+  deleted_at: 2010-06-04 17:19:13
+
+two:
+  worker_type: MyString
+  start_at: 2010-06-04 17:19:13
+  end_at: 2010-06-04 17:19:13
+  deleted_at: 2010-06-04 17:19:13

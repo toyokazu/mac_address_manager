@@ -1,0 +1,12 @@
+<h1>ホスト名(別名)の新規登録</h1>
+
+<% form_for :alias_name, @alias_name, :url => mac_address_alias_names_path(:id => @alias_name.id, :mac_address_id => @alias_name.mac_address_id), :html => {:method => :post} do |f| %>
+  <%= f.error_messages %>
+
+  <%= render :partial => f %>
+  <p>
+    <%= f.submit '作成' %>
+  </p>
+<% end %>
+
+<%= link_to '戻る', mac_address_path(:id => @alias_name.mac_address_id) %>
