@@ -10,35 +10,33 @@ module Rinda
 
     def initialize(ts, options = {})
       super(ts, options)
-      begin
-        @config = YAML.load_file("#{RAILS_ROOT}/config/cron.yml")
-      rescue => error
-        output_error(error, "Can not find cron.yml. Use default configuration.")
-        @config = {"num_of_instances" => 1, "interval" => 60, "worker_record" => true}
-      end
+      @config = options
       begin
         @jobs = YAML.load_file("#{RAILS_ROOT}/config/cron_jobs.yml")
       rescue => error
         output_error(error, "Can not find cron_jobs.yml. Do notiong.")
       end
-      @workers = []
-      @jobs.each do |job|
-        @workers << Rinda::Client.new(job[1], :ts => @ts, :key => @key, :logger => @logger)
-      end
     end
 
     def worker_record(worker_type)
-      WorkerRecord.first(:conditions => {:worker_type => worker_type}) || WorkerRecord.new(:worker_type => worker_type)
+      if defined?(WorkerRecord)
+        WorkerRecord.first(:conditions => {:worker_type => worker_type}) || WorkerRecord.new(:worker_type => worker_type)
+      end
     end
 
-    def main_loop
-      logger.info("Start main_loop of #{self.class.to_s}")
+    def cron_loop
+      logger.info("Start cron_loop of #{self.class.to_s}")
       while true
         sleep(interval)
         logger.debug("before exec_cron_jobs")
         exec_cron_jobs
         logger.debug("after exec_cron_jobs")
       end
+    end
+
+    def main_loop
+      Thread.new { cron_loop }
+      super
     end
 
     def interval
@@ -77,23 +75,24 @@ module Rinda
         begin
           logger.debug("begin synchronization area of exec_cron_jobs")
           @jobs.each_with_index do |job, i|
-            worker_type = Rinda::Worker.to_class_name(job[1])
-            worker = @workers[i]
+            schedule, worker_name, method, options = job
+            worker_type = Rinda::Worker.to_class_name(worker_name)
+            worker = Rinda::Client.new(worker_name, :ts => @ts, :key => @key, :logger => @logger)
             logger.debug("check job execution time")
-            if designated_time?(job[0])
+            if designated_time?(schedule)
               logger.debug("write job request to tuplespace")
-              if worker.read_request_all(job[2].to_sym, job[3]).size == 0
+              if worker.read_request_all(method, options).size == 0
                 record_start_time(worker_type)
-                worker.write_request(job[2].to_sym, job[3])
+                worker.write_request(method, options)
               else
                 logger.info("Previous job request still remains. Do nothing.")
               end
             end
             logger.debug("remove finished job tuples")
-            if worker.read_done_all(job[2].to_sym, job[3]).size > 0
+            if worker.read_done_all(method, options).size > 0
               # FIXME
               # recorded end time is not precise end time.
-              worker.take_done(job[2].to_sym, job[3])
+              worker.take_done(method, options)
               record_end_time(worker_type)
             end
           end
@@ -109,7 +108,9 @@ module Rinda
 
     class << self # Class Methods
       def worker_record(class_name)
-        WorkerRecord.first(:conditions => {:worker_type => class_name})
+        if defined?(WorkerRecord)
+          WorkerRecord.first(:conditions => {:worker_type => class_name})
+        end
       end
     end
   end

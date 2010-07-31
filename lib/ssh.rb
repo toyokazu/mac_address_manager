@@ -33,14 +33,18 @@ module SSH
       password = @config[classname][hostname][1]
       PTY.spawn("#{ssh_cmd} #{username}@#{ipv4_addr}") do |r, w|
         w.sync = true
-        r.expect("#{username}@#{ipv4_addr}'s password: ")
-        w.puts(password)
-        r.expect("#{hostname}> ")
-        w.puts("enable")
-        r.expect("#{hostname}# ")
-        w.puts("copy tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv aaa-local-db")
-        r.expect("done.\n#{hostname}# ")
-        w.puts("exit")
+        r.expect("#{username}@#{ipv4_addr}'s password: ") do
+          w.puts(password)
+        end
+        r.expect("#{hostname}> ") do
+          w.puts("enable")
+        end
+        r.expect("#{hostname}# ") do
+          w.puts("copy tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv aaa-local-db")
+        end
+        r.expect("done.\n#{hostname}# ") do
+          w.puts("exit")
+        end
       end
     end
 
@@ -51,14 +55,18 @@ module SSH
       password = @config[classname][hostname][1]
       PTY.spawn("#{ssh_cmd} #{username}@#{ipv4_addr}") do |r, w|
         w.sync = true
-        r.expect("#{username}@#{ipv4_addr}'s password: ")
-        w.puts(password)
-        r.expect("#{hostname}> ")
-        w.puts("enable")
-        r.expect("#{hostname}# ")
-        w.puts("copy aaa-local-db tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv")
-        r.expect("done.\n#{hostname}# ")
-        w.puts("exit")
+        r.expect("#{username}@#{ipv4_addr}'s password: ") do
+          w.puts(password)
+        end
+        r.expect("#{hostname}> ") do
+          w.puts("enable")
+        end
+        r.expect("#{hostname}# ") do
+          w.puts("copy aaa-local-db tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv")
+        end
+        r.expect("done.\n#{hostname}# ") do
+          w.puts("exit")
+        end
       end
     end
   end

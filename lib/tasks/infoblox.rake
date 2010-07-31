@@ -1,3 +1,5 @@
+# for FileUtils.mkdir_p
+require 'fileutils'
 require 'yaml'
 
 namespace :infoblox do
@@ -19,7 +21,7 @@ namespace :infoblox do
   desc "init infoblox"
   task :init => :config do
     begin
-      Dir.mkdir(@path) if !File.exists?(@path)
+      FileUtils.mkdir_p(@path) if !File.exists?(@path)
     rescue => error
       output_error(error, "initialize infoblox environments")
     end

@@ -85,7 +85,7 @@ class MacAddressesController < ApplicationController
 
   # POST /mac_addresses/update_all
   def update_all
-    client = Rinda::Client.new('update')
+    client = Rinda::Client.new('update', :key => session[:session_id])
     repeat_count = 3
     until client.worker.lock(current_user.default_group.id)
       sleep(1)

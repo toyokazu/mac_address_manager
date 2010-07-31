@@ -1,3 +1,5 @@
+# for FileUtils.mkdir_p
+require 'fileutils'
 require 'yaml'
 
 namespace :tftpd do
@@ -21,7 +23,7 @@ namespace :tftpd do
   desc "init tftpd"
   task :init => :config do
     begin
-      Dir.mkdir(@path) if !File.exists?(@path)
+      FileUtils.mkdir_p(@path) if !File.exists?(@path)
     rescue => error
       output_error(error, "initialize tftpd environments")
     end

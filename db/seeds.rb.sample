@@ -13,4 +13,3 @@ admin_user = User.create(:name => 'admin', :display_name => '管理者', :contac
 # create admin role
 admin_role = Role.create(:name => 'admin', :display_name => '管理者')
 admin_user.roles << admin_role
-# admin_user = User.create(:name => 'akiyama', :display_name => 'Toyokazu Akiyama (admin)')

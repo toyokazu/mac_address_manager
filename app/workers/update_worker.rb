@@ -3,10 +3,6 @@ class UpdateWorker < Rinda::Worker
   include MonitorMixin
   @@lock_table = {}
 
-  def allowed_instance_methods
-    super + %w(update_and_unlock)
-  end
-
   # called via DRbObject interface
   def lock(group_id) 
     synchronize do
@@ -26,7 +22,7 @@ class UpdateWorker < Rinda::Worker
 
   # wrapper interface for Rinda::Client
   def update_and_unlock_request(group_id, csv)
-    write_request(:update_and_unlock, {:group_id => group_id, :csv => csv})
+    write_request("update_and_unlock", {:group_id => group_id, :csv => csv})
   end
 
   # options

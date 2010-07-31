@@ -6,8 +6,12 @@ class SyncWorker < Rinda::Worker
 
   def initialize(ts, options = {})
     super(ts, options)
+  end
+
+  def main_loop
     @infoblox_client = Rinda::Client.new('infoblox', :ts => @ts, :key => @key, :logger => @logger)
     @switch_client = Rinda::Client.new('switch', :ts => @ts, :key => @key, :logger => @logger)
+    super()
   end
 
   def sync
@@ -45,16 +49,16 @@ class SyncWorker < Rinda::Worker
     tasks = tasks + to_infoblox_task("update", additional_addrs)
     tasks = tasks + to_infoblox_task("delete", deleted_addrs)
 
-    # output tmp/infoblox/year-month-day-hour-minute-sec-hash(usec).yml
+    # output tmp/infoblox/year-month-day-hour-minute-sec-usec.yml
     # those files should be removed by cron_worker (after a week seems to be good
     # for default?)
-    task_file = "#{RAILS_ROOT}/tmp/infoblox/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{OpenSSL::Digest::SHA1.hexdigest(Time.now.usec.to_s)[0..15]}"
+    task_file = "#{RAILS_ROOT}/tmp/infoblox/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{Time.now.usec}"
     File.open(task_file) do |f|
       YAML.dump(tasks, f)
     end
 
     # submit Infoblox task into TupleSpace
-    @infoblox_worker.write_request(:sync, task_file)
+    @infoblox_client.write_request("sync", task_file)
 
     # generate aaa-local-db for all switches
     
@@ -70,7 +74,7 @@ class SyncWorker < Rinda::Worker
         end
       end
       # submit Switch task into TupleSpace
-      @switch_worker.write_request(:sync, location)
+      @switch_client.write_request("sync", location)
     end
   end
 

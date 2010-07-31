@@ -1,3 +1,7 @@
+require 'delegate'
+require File.expand_path('../../rinda/worker',  __FILE__)
+require File.expand_path('../../rinda/worker_runner',  __FILE__)
+
 module Rinda
   class Client < DelegateClass(Rinda::Worker)
     attr_reader :worker_client
@@ -41,7 +45,7 @@ module Rinda
 
     def worker(uri = '[^\s]+')
       # return the reference to the target Worker
-      @worker ||= Rinda::Worker.read(ts, @worker_class_name.to_sym, uri)[2]
+      @worker ||= Rinda::Worker.read(ts, @worker_class_name, uri)[2]
     end
   end
 end

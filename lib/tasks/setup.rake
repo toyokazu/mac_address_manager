@@ -28,10 +28,10 @@ namespace :setup do
   task :init_all => [:"tftpd:init", :"infoblox:init"]
 
   desc "start servers"
-  task :start_servers => [:"tftpd:start", :"tuplespace:start", :"cron_worker:start", :"workers:start"]
+  task :start_servers => [:"tftpd:start", :"tuplespace:start", :"workers:start"]
 
   desc "stop servers"
-  task :stop_servers => [:"workers:stop", :"cron_worker:stop", :"tuplespace:stop", :"tftpd:stop"]
+  task :stop_servers => [:"workers:stop", :"tuplespace:stop", :"tftpd:stop"]
 
   namespace :tuplespace do
     desc "start rinda_ts"
@@ -49,39 +49,19 @@ namespace :setup do
     end
   end
 
-  namespace :cron_worker do
-    desc "start cron_worker"
-    task :start => :config do
-      @start_cron_worker = "#{rinda_worker} --worker=rinda/cron --daemon --log=cron_worker.log --pid=cron_worker.pid start"
-      puts @start_cron_worker
-      system @start_cron_worker
-    end
-
-    desc "stop cron_worker"
-    task :stop => :config do
-      @stop_cron_worker = "#{rinda_worker} --worker=rinda/cron --daemon --log=cron_worker.log --pid=cron_worker.pid stop"
-      puts @stop_cron_worker
-      system @stop_cron_worker
-    end
-  end
-
   namespace :workers do
     desc "start workers"
     task :start => :config do
-      ["update", "sync", "infoblox", "switch"].each do |worker|
-        @start_worker = "#{rinda_worker} --worker=#{worker} --daemon --log=#{worker}_worker.log --threads=#{@workers[worker]} --pid=#{worker}_worker.pid start"
-        puts @start_worker
-        system @start_worker
-      end
+      @start_workers = "#{rinda_worker_cluster} start"
+      puts @start_workers
+      system @start_workers
     end
 
     desc "stop workers"
     task :stop => :config do
-      ["update", "sync", "infoblox", "switch"].each do |worker|
-        @stop_worker = "#{rinda_worker} --worker=#{worker} --daemon --log=#{worker}_worker.log --threads=#{@workers[worker]} --pid=#{worker}_worker.pid stop"
-        puts @stop_worker
-        system @stop_worker
-      end
+      @stop_workers = "#{rinda_worker_cluster} stop"
+      puts @stop_workers
+      system @stop_workers
     end
   end
 end
