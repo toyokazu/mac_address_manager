@@ -42,4 +42,8 @@
 
 <%= link_to '編集', edit_mac_address_path(@mac_address) %> |
 <%= link_to 'ホスト名(別名)一覧', mac_address_alias_names_path(:mac_address_id => @mac_address.id) %> |
+<% if @group.nil? || !controller.admin_user? %>
 <%= link_to '戻る', mac_addresses_path %>
+<% else %>
+<%= link_to '戻る', group_mac_addresses_path(:group_id => @group.id) %>
+<% end %>

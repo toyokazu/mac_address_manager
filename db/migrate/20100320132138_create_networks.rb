@@ -4,6 +4,7 @@ class CreateNetworks < ActiveRecord::Migration
       t.references :user
       t.string :netaddr
       t.integer :netmask
+      t.string :description
 
       t.timestamps
     end

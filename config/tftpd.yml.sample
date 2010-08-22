@@ -1,6 +1,13 @@
 # user: username to start tftpd server
-## path: chroot directory of the tftpd server
-# default_addr: default interface to listen
 user:
+
+## path: chroot directory of the tftpd server
+# basically default path RAILS_ROOT/tmp/tftproot is used.
 # path:
+
+# default_addr: default interface to listen
+# Currently default_addr must be specified for switch_worker configuration.
+#
+# Example:
+# default_addr: 192.168.10.10
 default_addr:

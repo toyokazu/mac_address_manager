@@ -13,6 +13,11 @@
   <%=h @network.netmask %>
 </p>
 
+<p>
+  <b>備考:</b>
+  <%=h @network.description %>
+</p>
+
 
 <%= link_to '編集', edit_network_path(@network) %> |
 <%= link_to '戻る', networks_path %>

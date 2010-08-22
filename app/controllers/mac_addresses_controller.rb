@@ -5,8 +5,19 @@ class MacAddressesController < ApplicationController
 
   # GET /mac_addresses
   # GET /mac_addresses.xml
+  # for admin_user
+  # GET /groups/1/mac_addresses
+  # GET /groups/1/mac_addresses.xml
   def index
-    @mac_addresses = MacAddress.all(gen_cond)
+    if !params["group_id"].nil? && admin_user?
+      begin
+        @group = Group.find(params["group_id"])
+      rescue ActiveRecord::RecordNotFound => error
+        flash[:notice] = 'Specified group does not exists.'
+        redirect_back_or_default and return
+      end
+    end
+    @mac_addresses = MacAddress.all(gen_cond(params["group_id"]))
 
     respond_to do |format|
       format.html # index.html.erb
@@ -24,9 +35,20 @@ class MacAddressesController < ApplicationController
 
   # GET /mac_addresses/1
   # GET /mac_addresses/1.xml
+  # for admin_user
+  # GET /groups/1/mac_addresses
+  # GET /groups/1/mac_addresses.xml
   def show
+    if !params["group_id"].nil? && admin_user?
+      begin
+        @group = Group.find(params["group_id"])
+      rescue ActiveRecord::RecordNotFound => error
+        flash[:notice] = 'Specified group does not exists.'
+        redirect_back_or_default and return
+      end
+    end
     begin
-      @mac_address = MacAddress.find(params[:id], gen_cond)
+      @mac_address = MacAddress.find(params[:id], gen_cond(params["group_id"]))
     rescue ActiveRecord::RecordNotFound => error
       flash[:notice] = 'You do not have a permission.'
       redirect_back_or_default and return
@@ -142,8 +164,11 @@ class MacAddressesController < ApplicationController
     end
   end
 
-  def gen_cond
-    return {} if admin_user?
+  def gen_cond(group_id = nil)
+    if admin_user?
+      return {} if group_id.nil?
+      return {:conditions => {:group_id => group_id}}
+    end
     {:conditions => {:group_id => current_user.default_group.id}}
   end
 end

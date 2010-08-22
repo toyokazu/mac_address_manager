@@ -22,8 +22,7 @@ module SSH
   class Apresia < Base
     def initialize
       super
-      @tftpd_config = YAML.load_file("#{RAILS_ROOT}/config/tftpd.yml")
-      @tftpd_addr = @tftpd_config["default_addr"]
+      @tftpd = TFTPD.new
     end
 
     def sync_from_serv_to_switch(location)
@@ -40,7 +39,7 @@ module SSH
           w.puts("enable")
         end
         r.expect("#{hostname}# ") do
-          w.puts("copy tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv aaa-local-db")
+          w.puts("copy tftp #{@tftpd.default_addr} #{hostname}_aaa-local-db.csv aaa-local-db")
         end
         r.expect("done.\n#{hostname}# ") do
           w.puts("exit")
@@ -48,11 +47,17 @@ module SSH
       end
     end
 
+    # This method creates MAC address filter configuration backup
+    # for each switch every day. Then keep them for a month.
     def sync_from_switch_to_serv(location)
       hostname = location.hostname
       ipv4_addr = location.ipv4_addr
       username = @config[classname][hostname][0]
       password = @config[classname][hostname][1]
+      # create date directory if it does not exist.
+      day = Time.now.strftime("%d")
+      dst_dir = "#{@tftpd.path}/#{day}"
+      FileUtils.mkdir_p(dst_dir) if !File.exists?(dst_dir)
       PTY.spawn("#{ssh_cmd} #{username}@#{ipv4_addr}") do |r, w|
         w.sync = true
         r.expect("#{username}@#{ipv4_addr}'s password: ") do
@@ -62,7 +67,7 @@ module SSH
           w.puts("enable")
         end
         r.expect("#{hostname}# ") do
-          w.puts("copy aaa-local-db tftp #{@tftpd_addr} #{hostname}_aaa-local-db.csv")
+          w.puts("copy aaa-local-db tftp #{@tftpd.default_addr} #{dst_dir}/#{hostname}_aaa-local-db.csv")
         end
         r.expect("done.\n#{hostname}# ") do
           w.puts("exit")

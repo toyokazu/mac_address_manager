@@ -63,15 +63,22 @@ class MacAddress < ActiveRecord::Base
   private
   # mac_addr
   def normalized_mac_addr
-    # if without ':' format, e.g. 1f2e3abb5566, then convert to 1f:2e:3a:bb:55:66.
-    if self.mac_addr.match(/^\s*[\da-z]{12}\s*$/)
-      self.mac_addr = self.mac_addr.gsub(/^\s*([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})\s*$/, '\1:\2:\3:\4:\5:\6')
-    end
-    # remove spaces.
-    self.mac_addr.downcase.gsub(/\s/, '')
+    MacAddress.normalize_mac_addr(self.mac_addr)    
   end
 
   def validate_mac_addr
-    self.mac_addr.match(/^\s*([\da-z]{2}:){5}[\da-z]{2}\s*/)
+    !self.mac_addr.nil? && self.mac_addr.match(/^\s*([\da-z]{2}:){5}[\da-z]{2}\s*/)
+  end
+
+  class << self
+    def normalize_mac_addr(mac_addr)
+      # convert to lower-case alphabets and remove spaces.
+      mac_addr = mac_addr.downcase.gsub(/\s/, '')
+      # if without ':' format, e.g. 1f2e3abb5566, then convert to 1f:2e:3a:bb:55:66.
+      if mac_addr.match(/^\s*[\da-z]{12}\s*$/)
+        mac_addr = mac_addr.gsub(/^\s*([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})\s*$/, '\1:\2:\3:\4:\5:\6')
+      end
+      mac_addr
+    end
   end
 end

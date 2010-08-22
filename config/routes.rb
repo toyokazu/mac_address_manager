@@ -7,7 +7,9 @@ ActionController::Routing::Routes.draw do |map|
     mac_address.resources :alias_names
   end
 
-  map.resources :groups, :collection => {:edit_users => :get}
+  map.resources :groups, :collection => {:edit_users => :get} do |group|
+    group.resources :mac_addresses
+  end
 
   map.resources :roles
 

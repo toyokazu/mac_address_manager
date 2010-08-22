@@ -2,6 +2,70 @@ require 'csv'
 require 'openssl'
 class SyncWorker < Rinda::Worker
   class << self # Class Methods
+    def worker_record(force = false)
+      Rinda::CronWorker.worker_record('SyncWorker', force)
+    end
+
+    def executing?
+      worker_record = SyncWorker.worker_record
+      (!worker_record.nil? && (worker_record.end_at.nil? || worker_record.end_at < worker_record.start_at))
+    end
+
+    def latest_finished_job_start_at
+      worker_record = SyncWorker.worker_record
+      # previous execution was finished normally
+      start_at = nil
+      # get latest finished SyncWorker job start time (start_at)
+      if !worker_record.nil? && !worker_record.end_at.nil?
+        if worker_record.end_at > worker_record.start_at
+          start_at = worker_record.start_at
+        else
+          start_at = worker_record.versions.last.previous.start_at
+        end
+      end
+      start_at
+    end
+
+    def diff_addrs
+      start_at = SyncWorker.latest_finished_job_start_at
+
+      # At first generate Infoblox tasks
+
+      # To reduce the number of rows processed, use worker_record timestamp.
+      #
+      # Newly created entries will not checked before submitting jobs to InfobloxWorker.
+      # If it requests to create already registered entry, InfobloxWorker
+      # (InfobloxManger.pm) just output errors and proceeds next entry, so thus no problems.
+      created_addrs = MacAddress.created_after(start_at).all
+      # In update case, check if there are the versioned entries before submitting.
+      updated_addrs = with_older_version?(MacAddress.updated_after(start_at).all)
+      # In delete case, there is no need to check (deleted entries must not be found here).
+      deleted_addrs = MacAddress.deleted_after(start_at).find_with_deleted(:all)
+
+      # additional updates caused by alias_name update
+      additional_addrs = []
+      alias_name_updated_addrs(start_at).each do |addr|
+        if !created_addrs.include?(addr) && !updated_addrs.include?(addr) && !deleted_addrs.include?(addr)
+          additional_addrs << addr
+        end
+      end
+      [created_addrs, updated_addrs, deleted_addrs, additional_addrs]
+    end
+
+    protected
+    def with_older_version?(addrs)
+      updated_addrs = []
+      addrs.each do |addr|
+        if addr.versions.count > 1
+          updated_addrs << addr
+        end
+      end
+      updated_addrs
+    end
+
+    def alias_name_updated_addrs(time)
+      AliasName.changed_after(time)
+    end
   end
 
   def initialize(ts, options = {})
@@ -15,33 +79,7 @@ class SyncWorker < Rinda::Worker
   end
 
   def sync
-    worker_record = Rinda::CronWorker.worker_record(self.class.to_s)
-    # previous execution was finished normally
-    @start_at = nil
-    if !worker_record.nil? && worker_record.end_at > worker_record.start_at
-      @start_at = worker_record.start_at
-    end
-
-    # At first generate Infoblox tasks
-
-    # To reduce the number of rows processed, use worker_record timestamp.
-    #
-    # Newly created entries will not checked before submitting jobs to InfobloxWorker.
-    # If it requests to create already registered entry, InfobloxWorker
-    # (InfobloxManger.pm) just output errors and proceeds next entry, so thus no problems.
-    created_addrs = MacAddress.created_after(@start_at).all
-    # In update case, check if there are the versioned entries before submitting.
-    updated_addrs = with_older_version?(MacAddress.updated_after(@start_at).all)
-    # In delete case, there is no need to check (deleted entries must not be found here).
-    deleted_addrs = MacAddress.deleted_after(@start_at).find_with_deleted(:all)
-
-    # additional updates caused by alias_name update
-    additional_addrs = []
-    alias_name_updated_addrs(@start_at).each do |addr|
-      if !created_addrs.include?(addr) && !updated_addrs.include?(addr) && !deleted_addrs.include?(addr)
-        additional_addrs << addr
-      end
-    end
+    created_addrs, updated_addrs, deleted_addrs, additional_addrs = SyncWorker.diff_addrs
 
     tasks = []
     tasks = tasks + to_infoblox_task("create", created_addrs)
@@ -53,12 +91,12 @@ class SyncWorker < Rinda::Worker
     # those files should be removed by cron_worker (after a week seems to be good
     # for default?)
     task_file = "#{RAILS_ROOT}/tmp/infoblox/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{Time.now.usec}"
-    File.open(task_file) do |f|
+    File.open(task_file, "wb") do |f|
       YAML.dump(tasks, f)
     end
 
     # submit Infoblox task into TupleSpace
-    @infoblox_client.write_request("sync", task_file)
+    @infoblox_client.write_request("update", task_file)
 
     # generate aaa-local-db for all switches
     
@@ -74,21 +112,11 @@ class SyncWorker < Rinda::Worker
         end
       end
       # submit Switch task into TupleSpace
-      @switch_client.write_request("sync", location)
+      @switch_client.write_request("update", location)
     end
   end
 
   protected
-  def with_older_version?(addrs)
-    updated_addrs = []
-    addrs.each do |addr|
-      if addr.versions.count > 1
-        updated_addrs << addr
-      end
-    end
-    updated_addrs
-  end
-
   def to_infoblox_task(mac_addrs, operation)
     mac_addrs.map do |addr|
       ["host_record",
@@ -101,9 +129,5 @@ class SyncWorker < Rinda::Worker
         ]
       ]
     end
-  end
-
-  def alias_name_updated_addrs(time)
-    AliasName.changed_after(time)
   end
 end

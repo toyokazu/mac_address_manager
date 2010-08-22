@@ -16,7 +16,11 @@
 
 <% @mac_addresses.each do |mac_address| %>
   <tr>
+    <% if controller.admin_user? %>
+    <td><%= link_to mac_address.group.display_name, group_mac_addresses_path(:group_id => mac_address.group.id) %></td>
+    <% else %>
     <td><%=h mac_address.group.display_name %></td>
+    <% end %>
     <td><%=h mac_address.hostname %></td>
     <td><%=h mac_address.mac_addr %></td>
     <td><%=h mac_address.ipv4_addr %></td>
@@ -29,7 +33,11 @@
     </td>
     <td><%=h mac_address.description %></td>
     -->
+    <% if @group.nil? || !controller.admin_user? %>
     <td><%= link_to '詳細', mac_address %></td>
+    <% else %>
+    <td><%= link_to '詳細', group_mac_address_path(:id => mac_address.id, :group_id => @group.id) %></td>
+    <% end %>
     <td><%= link_to '編集', edit_mac_address_path(mac_address) %></td>
     <td><%= link_to '削除', mac_address, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
@@ -39,5 +47,9 @@
 <br />
 
 <%= link_to '新規MACアドレス登録', new_mac_address_path %><br/>
+<% if @group.nil? || !controller.admin_user? %>
 <%= link_to 'CSVファイルのダウンロード', mac_addresses_path + ".csv" %><br/>
+<% else %>
+<%= link_to 'CSVファイルのダウンロード', group_mac_addresses_path(:group_id => @group.id) + ".csv" %><br/>
+<% end %>
 <%= link_to 'CSVファイルによる一括登録・更新', upload_mac_addresses_path %>
