@@ -90,7 +90,9 @@ class SyncWorker < Rinda::Worker
     # output tmp/infoblox/year-month-day-hour-minute-sec-usec.yml
     # those files should be removed by cron_worker (after a week seems to be good
     # for default?)
-    task_file = "#{RAILS_ROOT}/tmp/infoblox/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{Time.now.usec}"
+    path = "#{RAILS_ROOT}/tmp/infoblox"
+    FileUtils.mkdir_p(path) if !File.exists?(path)
+    task_file = "#{path}/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{Time.now.usec}"
     File.open(task_file, "wb") do |f|
       YAML.dump(tasks, f)
     end
