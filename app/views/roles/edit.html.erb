@@ -11,6 +11,7 @@
     <% @users.each do |user| %>
       <%= check_box_tag 'role[user_ids][]', user.id, @user_ids.include?(user.id) %><%= h user.display_name %><br />
     <% end %>
+    <%= hidden_field_tag 'role[user_ids][]' %>
   </p>
 
   <p>

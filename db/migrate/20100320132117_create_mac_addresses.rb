@@ -6,7 +6,6 @@ class CreateMacAddresses < ActiveRecord::Migration
       t.string :mac_addr
       t.string :ipv4_addr
       t.string :ipv6_addr
-      t.references :location
       t.string :description
       t.timestamp :deleted_at
 

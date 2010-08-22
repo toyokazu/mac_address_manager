@@ -14,6 +14,15 @@
   <%= hidden_field_tag 'group[user_ids][]', @group.user_id %>
   </p>
   <p>
+  <% @location_ids = params[:locations] || @group.location_ids %>
+  <% @locations = Location.selectable.all %>
+  <%= label_tag :locations, 'デフォルト接続先' %><br />
+  <% @locations.each do |location| %>
+    <%= check_box_tag 'group[location_ids][]', location.id, @location_ids.include?(location.id) %><%= h location.description %><br />
+  <% end %>
+  <%= hidden_field_tag 'group[location_ids][]' %>
+  </p>
+  <p>
     <%= f.submit '更新' %>
   </p>
 <% end %>

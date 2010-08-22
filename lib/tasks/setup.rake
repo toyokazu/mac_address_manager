@@ -68,6 +68,8 @@ namespace :setup do
         mac_address =
           MacAddress.first(:conditions => {:ipv4_addr => row[0], :hostname => row[1], :mac_addr => mac_addr}) ||
           MacAddress.create(:ipv4_addr => row[0], :hostname => row[1], :mac_addr => row[2], :description => row[3], :group => owner.default_group)
+        mac_address.location_ids = owner.default_group.location_ids
+        mac_address.save
       end
 
       # The entities initialized here are assumed to be registered to the
