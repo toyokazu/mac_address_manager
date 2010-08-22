@@ -14,6 +14,8 @@ namespace :tftpd do
     end
   end
 
+  task :init => :config
+
   desc "start tftpd"
   task :start => :config do
     begin
