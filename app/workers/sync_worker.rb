@@ -78,8 +78,16 @@ class SyncWorker < Rinda::Worker
     super()
   end
 
-  def sync
+  def sync(options = {})
     created_addrs, updated_addrs, deleted_addrs, additional_addrs = SyncWorker.diff_addrs
+
+    diff_addrs = created_addrs + updated_addrs + deleted_addrs + additional_addrs
+
+    # if there is no updates, just return.
+    if diff_addrs.empty?
+      logger.debug "No updates are found in SyncWorker#sync. Do nothing."
+      return
+    end
 
     tasks = []
     tasks = tasks + to_infoblox_task("create", created_addrs)
@@ -105,7 +113,10 @@ class SyncWorker < Rinda::Worker
     # output tmp/tftproot/hostname_aaa-local-db.csv
     # for mac address filtering DB, all updates are submitted to
     # all switches to simplify the implementation.
-    locations = Location.all
+    locations = []
+    diff_addrs.each do |diff_addr|
+      locations = (locations + diff_addr.locations).uniq
+    end
     locations.each do |location|
       csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
       CSV::Writer.generate(csv_file, "\t") do |csv|
@@ -119,7 +130,7 @@ class SyncWorker < Rinda::Worker
   end
 
   protected
-  def to_infoblox_task(mac_addrs, operation)
+  def to_infoblox_task(operation, mac_addrs)
     mac_addrs.map do |addr|
       ["host_record",
         [operation,

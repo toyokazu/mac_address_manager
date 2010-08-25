@@ -14,7 +14,7 @@ class SwitchWorker < Rinda::Worker
     switch.sync_from_switch_to_serv(location)
   end
 
-  def backup_all
+  def backup_all(options = {})
     locations = Location.all
     locations.each do |location|
       write_request("backup", location)

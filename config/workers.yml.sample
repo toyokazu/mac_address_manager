@@ -1,0 +1,83 @@
+# workers.yml specifies how many processes and threads created
+# by rinda_worker script for each workers. Top level array
+# shows processes, the second level array shows threads in
+# each process.
+# - - - 1 # number of threads for worker01 in process01
+#     - "worker01"
+#     - worker_option01: for worker01 initializer
+#       worker_option02: for worker01 initializer
+#   - - 2 # number of threads for worker02 in process01
+#     - "worker02"
+#     - worker_option01: for worker02 initializer
+#       worker_option02: for worker02 initializer
+#   - logger_worker: true
+#     max_instances: 20
+#     process_option01: process01 rinda_worker command line option
+# - - - 3 # number of threads for worker03 in process02
+#     - "woker03"
+#     - {}
+#   - - 3 # number of threads for worker04 in process02
+#     - "worker04"
+#     - option01: for worker04 initializer
+#   - max_instances: 20
+#     process_option01: process02 rinda_worker command line option
+#
+# for LoggerWorker example:
+# - - - 1
+#     - "rinda/logger"
+#     - {}
+#   - log_file: rinda_logger.log
+#
+# for CronWorker example:
+# - - - 1
+#     - "rinda/cron"
+#     - interval: 60 # specify checking cron_jobs.yml interval
+#       worker_record: true
+#         # if your cron job needs timestamp of the previous execution,
+#         # set worker_record flag true.
+- - - 1
+    - "rinda/logger"
+    - {}
+  - log_file: rinda_logger.log
+    max_instances: 20
+    ts_uri: druby://localhost:54321
+
+- - - 1
+    - "rinda/cron"
+    - interval: 60
+      worker_record: true
+  - log_file: rinda_cron.log
+    max_instances: 20
+    ts_uri: druby://localhost:54321
+
+- - - 1
+    - "update"
+    - accept_methods:
+      - "update_and_unlock"
+  - logger_worker: true
+    max_instances: 20
+    ts_uri: druby://localhost:54321
+
+- - - 1
+    - "sync"
+    - accept_methods:
+      - "sync"
+  - logger_worker: true
+    max_instances: 20
+    ts_uri: druby://localhost:54321
+
+- - - 1
+    - "infoblox"
+    - accept_methods:
+      - "sync"
+  - logger_worker: true
+    max_instances: 20
+    ts_uri: druby://localhost:54321
+
+- - - 3
+    - "switch"
+    - accept_methods:
+      - "sync"
+  - logger_worker: true
+    max_instances: 20
+    ts_uri: druby://localhost:54321
