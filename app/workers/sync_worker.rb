@@ -138,7 +138,7 @@ class SyncWorker < Rinda::Worker
           addr.ipv4_addr,
           addr.ipv6_addr,
           addr.alias_names.map {|alias_name| alias_name.hostname},
-          addr.comment
+          addr.description
         ]
       ]
     end

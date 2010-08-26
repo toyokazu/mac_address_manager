@@ -39,45 +39,41 @@
     - "rinda/logger"
     - {}
   - log_file: rinda_logger.log
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    logger_level: debug
+    ts_uri: "druby://localhost:54321"
 
 - - - 1
     - "rinda/cron"
     - interval: 60
       worker_record: true
   - log_file: rinda_cron.log
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    logger_level: debug
+    ts_uri: "druby://localhost:54321"
 
 - - - 1
     - "update"
     - accept_methods:
       - "update_and_unlock"
   - logger_worker: true
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    ts_uri: "druby://localhost:54321"
 
 - - - 1
     - "sync"
     - accept_methods:
       - "sync"
   - logger_worker: true
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    ts_uri: "druby://localhost:54321"
 
 - - - 1
     - "infoblox"
     - accept_methods:
-      - "sync"
+      - "update"
   - logger_worker: true
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    ts_uri: "druby://localhost:54321"
 
 - - - 3
     - "switch"
     - accept_methods:
-      - "sync"
+      - "update"
   - logger_worker: true
-    max_instances: 20
-    ts_uri: druby://localhost:54321
+    ts_uri: "druby://localhost:54321"
