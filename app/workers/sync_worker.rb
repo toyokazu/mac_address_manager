@@ -119,13 +119,13 @@ class SyncWorker < Rinda::Worker
     end
     locations.each do |location|
       csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
-      CSV::Writer.generate(csv_file, "\t") do |csv|
+      CSV::Writer.generate(File.open(csv_file, "w"), "\t") do |csv|
         location.mac_addresses.each do |mac_addr|
           csv << [mac_addr.mac_addr]
         end
       end
       # submit Switch task into TupleSpace
-      @switch_client.write_request("update", location)
+      @switch_client.write_request("update", location.attributes)
     end
   end
 

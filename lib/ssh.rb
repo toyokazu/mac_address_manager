@@ -3,7 +3,7 @@ require 'expect'
 module SSH
   class Base
     def self.get_instance(location)
-      (eval location.hosttype).new
+      (eval location["hosttype"]).new(location)
     end
 
     def initialize
@@ -20,14 +20,21 @@ module SSH
   end
 
   class Apresia < Base
-    def initialize
+    def initialize(location)
       super
       @tftpd = TFTPD.new
+      @location = location
     end
 
-    def sync_from_serv_to_switch(location)
-      hostname = location.hostname
-      ipv4_addr = location.ipv4_addr
+    def hostname
+      @location["hostname"]
+    end
+
+    def ipv4_addr
+      @location["ipv4_addr"]
+    end
+
+    def sync_from_serv_to_switch
       username = @config[classname][hostname][0]
       password = @config[classname][hostname][1]
       PTY.spawn("#{ssh_cmd} #{username}@#{ipv4_addr}") do |r, w|
@@ -49,9 +56,7 @@ module SSH
 
     # This method creates MAC address filter configuration backup
     # for each switch every day. Then keep them for a month.
-    def sync_from_switch_to_serv(location)
-      hostname = location.hostname
-      ipv4_addr = location.ipv4_addr
+    def sync_from_switch_to_serv
       username = @config[classname][hostname][0]
       password = @config[classname][hostname][1]
       # create date directory if it does not exist.
