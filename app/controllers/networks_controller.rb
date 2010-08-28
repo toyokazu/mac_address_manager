@@ -7,6 +7,7 @@ class NetworksController < ApplicationController
   # GET /networks.xml
   def index
     @networks = Network.all
+    @networks = @networks.sort {|a, b| a.addr <=> b.addr}
 
     respond_to do |format|
       format.html # index.html.erb

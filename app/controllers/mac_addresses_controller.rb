@@ -1,4 +1,5 @@
 require 'csv'
+require 'ipaddr'
 class MacAddressesController < ApplicationController
   before_filter CASClient::Frameworks::Rails::Filter
   before_filter :authorize
@@ -18,6 +19,7 @@ class MacAddressesController < ApplicationController
       end
     end
     @mac_addresses = MacAddress.all(gen_cond(params["group_id"]))
+    @mac_addresses = @mac_addresses.sort {|a, b| IPAddr.new(a.ipv4_addr) <=> IPAddr.new(b.ipv4_addr)}
 
     respond_to do |format|
       format.html # index.html.erb
