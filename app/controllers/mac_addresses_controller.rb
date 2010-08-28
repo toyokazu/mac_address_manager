@@ -19,7 +19,7 @@ class MacAddressesController < ApplicationController
       end
     end
     @mac_addresses = MacAddress.all(gen_cond(params["group_id"]))
-    @mac_addresses = @mac_addresses.sort {|a, b| IPAddr.new(a.ipv4_addr) <=> IPAddr.new(b.ipv4_addr)}
+    @mac_addresses = @mac_addresses.sort {|a, b| IPAddr.new(a.ipv4_addr.empty? ? "255.255.255.255" : a.ipv4_addr) <=> IPAddr.new(b.ipv4_addr.empty? ? "255.255.255.255" : b.ipv4_addr)}
 
     respond_to do |format|
       format.html # index.html.erb
