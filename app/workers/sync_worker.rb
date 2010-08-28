@@ -44,9 +44,9 @@ class SyncWorker < Rinda::Worker
 
       # additional updates caused by alias_name update
       additional_addrs = []
-      alias_name_updated_addrs(start_at).each do |addr|
-        if !created_addrs.include?(addr) && !updated_addrs.include?(addr) && !deleted_addrs.include?(addr)
-          additional_addrs << addr
+      updated_alias_names(start_at).each do |alias_name|
+        if !created_addrs.include?(alias_name.mac_address) && !updated_addrs.include?(alias_name.mac_address) && !deleted_addrs.include?(alias_name.mac_address)
+          additional_addrs << alias_name.mac_address
         end
       end
       [created_addrs, updated_addrs, deleted_addrs, additional_addrs]
@@ -63,7 +63,7 @@ class SyncWorker < Rinda::Worker
       updated_addrs
     end
 
-    def alias_name_updated_addrs(time)
+    def updated_alias_names(time)
       AliasName.changed_after(time)
     end
   end

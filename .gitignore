@@ -5,6 +5,4 @@ public/cache/**/*
 doc/api
 doc/app
 vendor/plugins/**/*
-config/rinda_*
-script/rinda_*
 config/thin.conf

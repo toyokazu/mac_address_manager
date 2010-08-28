@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../lib/drb/runner',  __FILE__)
+require File.expand_path('../../lib/rinda/worker_runner',  __FILE__)
+require File.expand_path('../../lib/rinda/worker',  __FILE__)
+
+options = {
+  :uri          => 'druby://:0',
+  :detach       => false,
+  :max_instances => nil,
+  :num_threads  => 1,
+  :env_file  => File.expand_path('../../config/rinda_environment',  __FILE__),
+  :environment  => "development",
+  :worker       => 'rinda/cron'
+}
+
+class RailsWorkerRunner < Rinda::WorkerRunner
+  def self.command
+    File.basename(__FILE__)
+  end
+    
+  def init_env
+    ENV["RAILS_ENV"] = @options[:environment]
+    require @options[:env_file]
+  end
+end
+
+runner = RailsWorkerRunner.new(ARGV, options)
+runner.run!
