@@ -81,6 +81,6 @@ module SSH
     end
   end
 
-  class Infoblox < Base
+  class Alaxala < Base
   end
 end

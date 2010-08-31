@@ -19,6 +19,13 @@
     <%= form.label :ipv6_addr, 'IPv6アドレス' %><br />
     <%= form.text_field :ipv6_addr %>
   </p>
+  <% if controller.admin_user? %>
+  <p>
+    <%= form.label :dhcp, 'DHCPを利用する' %><br />
+    <%= form.radio_button :dhcp, true, :checked => @mac_address.dhcp  %>true
+    <%= form.radio_button :dhcp, false, :checked => !@mac_address.dhcp  %>false
+  </p>
+  <% end %>
   <p>
   <% @location_ids = params[:locations] || @mac_address.location_ids %>
   <% @location_ids = controller.current_user.default_group.location_ids if @location_ids.empty? %>

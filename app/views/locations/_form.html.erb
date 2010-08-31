@@ -7,7 +7,7 @@
     <%= form.text_field :hostname %>
   </p>
   <p>
-    <%= form.label :hosttype, 'ホストの種類 (例: Apresia, Infoblox)' %><br />
+    <%= form.label :hosttype, 'ホストの種類 (例: Apresia, Alaxala)' %><br />
     <%= form.text_field :hosttype %>
   </p>
   <p>
@@ -17,10 +17,6 @@
   <p>
     <%= form.label :ipv6_addr, 'IPv6アドレス' %><br />
     <%= form.text_field :ipv6_addr %>
-  </p>
-  <p>
-    <%= form.label :register_dns, 'DNSへの登録' %><br />
-    <%= form.select :register_dns, [["登録する", true], ["登録しない", false]] %>
   </p>
   <p>
     <%= form.label :selectable, '接続先候補' %><br />

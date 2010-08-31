@@ -31,7 +31,7 @@
             <li><%= link_to 'グループ一覧', groups_path %></li>
           <% if controller.admin_user? %>
             <li><%= link_to 'ロール一覧', roles_path %></li>
-            <li><%= link_to '接続先(サーバ)一覧', locations_path %></li>
+            <li><%= link_to '接続先一覧', locations_path %></li>
           <% else %>
             <li><%= link_to '接続先一覧', locations_path %></li>
           <% end %>

@@ -6,6 +6,9 @@
     <th>ホスト名</th>
     <th>MACアドレス</th>
     <th>IPv4アドレス</th>
+    <% if controller.admin_user? %>
+    <th>DHCP</th>
+    <% end %>
     <!--
     <th>IPv6アドレス</th>
     <th>接続先</th>
@@ -24,6 +27,9 @@
     <td><%=h mac_address.hostname %></td>
     <td><%=h mac_address.mac_addr %></td>
     <td><%=h mac_address.ipv4_addr %></td>
+    <% if controller.admin_user? %>
+    <td><%=h mac_address.dhcp %></td>
+    <% end %>
     <!--
     <td><%=h mac_address.ipv6_addr %></td>
     <td>

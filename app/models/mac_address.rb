@@ -57,6 +57,14 @@ class MacAddress < ActiveRecord::Base
         return false
       end
     end
+
+    # the both addresses are not specified
+    if (self.ipv4_addr.nil? || self.ipv4_addr.empty?) &&
+        (self.ipv6_addr.nil? || self.ipv6_addr.empty?)
+      errors.add(:ipv4_addr, "At least, ipv4_addr or ipv6_addr must be specified.")
+      errors.add(:ipv6_addr, "At least, ipv4_addr or ipv6_addr must be specified.")
+      return false
+    end
     true
   end
 

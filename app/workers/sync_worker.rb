@@ -121,7 +121,7 @@ class SyncWorker < Rinda::Worker
       csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
       CSV::Writer.generate(File.open(csv_file, "w"), "\t") do |csv|
         location.mac_addresses.each do |mac_addr|
-          csv << [mac_addr.mac_addr]
+          csv << [mac_addr.packed_mac_addr]
         end
       end
       # submit Switch task into TupleSpace

@@ -29,6 +29,11 @@
 </p>
 
 <p>
+  <b>DHCPを利用する:</b>
+  <%=h @mac_address.dhcp %>
+</p>
+
+<p>
   <b>接続先:</b><br/>
   <% @mac_address.locations.each do |location| %>
     <%=h location.description %><br/>

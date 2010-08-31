@@ -1,10 +1,10 @@
 <p>
-  <b>接続先<%=h '(サーバ設置場所)' if controller.admin_user? %>:</b>
+  <b>接続先:</b>
   <%=h @location.description %>
 </p>
 
 <p>
-  <b>ネットワーク<%=h '(サーバ)' if controller.admin_user? %>機器:</b><br/>
+  <b>ネットワーク機器:</b><br/>
   <p>
     ホスト名: <%=h @location.hostname %>
   </p>
@@ -21,11 +21,6 @@
 <% end %>
 </p>
 <% if controller.admin_user? %>
-<p>
-  <b>DNSへの登録:</b>
-  <%=h @location.register_dns ? '登録する' : '登録しない' %>
-</p>
-
 <p>
   <b>接続先候補:</b>
   <%=h @location.selectable ? '含める' : '含めない' %>

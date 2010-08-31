@@ -130,6 +130,7 @@ sub find_host_record {
       if (ref($ipv4addr) eq "Infoblox::DHCP::FixedAddr") {
         print "  ipv4addr: " . $ipv4addr->ipv4addr . "\n";
         print "  mac: " . $ipv4addr->mac . "\n";
+        print "  configure_for_dhcp: " . $ipv4addr->configure_for_dhcp . "\n";
         print "  comment: " . $ipv4addr->comment . "\n";
       } else {
         print "  " . $ipv4addr . "\n";
@@ -150,7 +151,7 @@ sub find_host_record {
 
 sub host_record {
   my $self = shift;
-  my ($operation, $name, $ipv4addr, $ipv6addr, $mac, $aliases, $comment) = @_;
+  my ($operation, $name, $ipv4addr, $ipv6addr, $mac, $configure_for_dhcp, $aliases, $comment) = @_;
   my @host_records = $self->{session}->get(
     object => "Infoblox::DNS::Host",
     name => $name
@@ -160,8 +161,8 @@ sub host_record {
       mac => $mac,
       ipv4addr => $ipv4addr,
       ipv6addr => $ipv6addr,
-      comment => $comment,
-      configure_for_dhcp => "true"
+      configure_for_dhcp => $configure_for_dhcp,
+      comment => $comment
     );
     my $host_record = Infoblox::DNS::Host->new(
       name => $name,
@@ -181,6 +182,7 @@ sub host_record {
     if (ref($fixed_addr) eq "Infoblox::DHCP::FixedAddr") {
       $fixed_addr->mac($mac);
       $fixed_addr->ipv4addr($ipv4addr);
+      $fixed_addr->configure_for_dhcp($configure_for_dhcp);
       $fixed_addr->comment($comment);
     } else {
       $fixed_addr = $ipv4addr;
