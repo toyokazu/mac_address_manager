@@ -21,7 +21,7 @@ module SSH
 
   class Apresia < Base
     def initialize(location)
-      super
+      super()
       @tftpd = TFTPD.new
       @location = location
     end
