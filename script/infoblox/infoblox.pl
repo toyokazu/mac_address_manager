@@ -1,5 +1,15 @@
 #!/usr/bin/env perl
 
+# Examples:
+# search Host Record with hostname
+# % ./script/infoblox/infoblox.pl -H -h telecon1
+#
+# search Host Record with IPv4 address
+# % ./script/infoblox/infoblox.pl -H -4 133.101.56.74
+#
+# search Fixed Address with MAC address
+# % ./script/infoblox/infoblox.pl -F -m 54:42:49:23:d3:4f
+
 #use strict;
 use Getopt::Std;
 use YAML::Syck;
