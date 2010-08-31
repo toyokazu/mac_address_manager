@@ -25,7 +25,7 @@ sub start_session {
     timeout => 60
   );
   unless ($self->{session}) {
-    print("Construct session failed: ",
+    print("Construct session failed: \n",
       Infoblox::status_code() . ":" . Infoblox::status_detail()) . "\n";
     return -1;
   }
@@ -74,8 +74,8 @@ sub fixed_addr {
       comment => $comment
     );
     my $response = $self->{session}->add($fixed_addr)
-      or print("Create new fixed_addr failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
+      or print("Create new fixed_addr failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   } elsif ($operation eq 'update') { # Update
     if ($#fixed_addrs == -1) {
       print("Cannot find any fixed_addr for updating with specified MAC address.\n");
@@ -84,16 +84,16 @@ sub fixed_addr {
     $fixed_addrs[0]->ipv4addr($ipv4addr);
     $fixed_addrs[0]->comment($comment);
     my $response = $self->{session}->modify($fixed_addrs[0])
-      or print("Modify fixed_addr (", $fixed_addrs[0]->mac,") failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
+      or print("Modify fixed_addr (", $fixed_addrs[0]->mac,") failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   } elsif ($operation eq 'delete') { # Delete
     if ($#fixed_addrs == -1) {
       print("Cannot find any fixed_addr for deleting with specified MAC address.\n");
       return -1;
     }
     my $response = $self->{session}->remove($fixed_addrs[0])
-      or print("Delete fixed_addr (", $fixed_addrs[0]->mac,") failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
+      or print("Delete fixed_addr (", $fixed_addrs[0]->mac,") failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   }
 }
 
@@ -171,8 +171,8 @@ sub host_record {
       comment => $comment
     );
     my $response = $self->{session}->add($host_record)
-      or print("Create new host_record failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
+      or print("Create new host_record failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   } elsif ($operation eq 'update') { # Update
     if ($#host_records == -1) {
       print("Cannot find any host_record for updating with specified hostname.\n");
@@ -193,16 +193,16 @@ sub host_record {
     $host_records[0]->aliases($aliases);
     $host_records[0]->comment($comment);
     my $response = $self->{session}->modify($host_records[0])
-      or print("Modify host_record (", $host_records[0]->name,") failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail());
+      or print("Modify host_record (", $host_records[0]->name,") failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   } elsif ($operation eq 'delete') { # Delete
     if ($#host_records == -1) {
       print("Cannot find any host_record for deleting with specified MAC address.\n");
       return -1;
     }
     my $response = $self->{session}->remove($host_records[0])
-      or print("Delete host_record (", $host_records[0]->name,") failed: ",
-      $self->{session}->status_code() . ":" . $self->{session}->status_detail()) . "\n";
+      or print("Delete host_record (", $host_records[0]->name,") failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   }
 }
 
