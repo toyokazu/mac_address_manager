@@ -77,7 +77,9 @@ class UpdateWorker < Rinda::Worker
       mac_addr.destroy
     end
     param_list.each do |params|
-      MacAddress.create(params)
+      mac_address = MacAddress.create(params)
+      mac_address.location_ids = group.location_ids
+      mac_address.save
     end
     unlock(options[:group_id])
   end

@@ -14,7 +14,7 @@
   <%= hidden_field_tag 'group[user_ids][]', @group.user_id %>
   </p>
   <p>
-  <% @location_ids = params[:locations] || @group.location_ids %>
+  <% @location_ids = params["location_ids"] || @group.location_ids %>
   <% @locations = Location.selectable.all %>
   <%= label_tag :locations, 'デフォルト接続先' %><br />
   <% @locations.each do |location| %>
