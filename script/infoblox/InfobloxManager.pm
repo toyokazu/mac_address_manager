@@ -60,10 +60,10 @@ sub print_fixed_addrs {
 
   print "Fixed Address\n";
   foreach my $fixed_addr (@{$fixed_addrs}) {
-    print "  mac: " . $fixed_addr->mac . "\n";
-    print "  ipv4addr: " . $fixed_addr->ipv4addr . "\n";
-    print "  configure_for_dhcp: " . $fixed_addr->configure_for_dhcp . "\n";
-    print "  comment: " . $fixed_addr->comment . "\n";
+    print "  mac: " . $fixed_addr->{mac} . "\n";
+    print "  ipv4addr: " . $fixed_addr->{ipv4addr} . "\n";
+    print "  configure_for_dhcp: " . $fixed_addr->{configure_for_dhcp} . "\n";
+    print "  comment: " . $fixed_addr->{comment} . "\n";
   }
 }
 
@@ -139,30 +139,30 @@ sub print_host_records {
   
   print "Host Records:\n";
   foreach my $host_record (@{$host_records}) {
-    print "name: " . $host_record->name . "\n";
+    print "name: " . $host_record->{name} . "\n";
     # ipv4addr has an array of string (IPv4 address) or FixedAddr instance
     print "ipv4addrs:\n";
-    foreach my $ipv4addr (@{$host_record->ipv4addrs}) {
+    foreach my $ipv4addr (@{$host_record->{ipv4addrs}}) {
       print "  --\n";
       if (ref($ipv4addr) eq "Infoblox::DHCP::FixedAddr") {
-        print "  ipv4addr: " . $ipv4addr->ipv4addr . "\n";
-        print "  mac: " . $ipv4addr->mac . "\n";
-        print "  configure_for_dhcp: " . $ipv4addr->configure_for_dhcp . "\n";
-        print "  comment: " . $ipv4addr->comment . "\n";
+        print "  ipv4addr: " . $ipv4addr->{ipv4addr} . "\n";
+        print "  mac: " . $ipv4addr->{mac} . "\n";
+        print "  configure_for_dhcp: " . $ipv4addr->{configure_for_dhcp} . "\n";
+        print "  comment: " . $ipv4addr->{comment} . "\n";
       } else {
         print "  " . $ipv4addr . "\n";
       }
     }
     # ipv6addr has an array of string (IPv6 address)
     print "ipv6addrs:\n";
-    foreach my $ipv6addr (@{$host_record->ipv6addrs}) {
+    foreach my $ipv6addr (@{$host_record->{ipv6addrs}}) {
       print "  " . $ipv6addr . "\n";
     }
     print "aliases:\n";
-    foreach my $alias (@{$host_record->aliases}) {
+    foreach my $alias (@{$host_record->{aliases}}) {
       print "  " . $alias . "\n";
     }
-    print "comment: " . $host_record->comment . "\n";
+    print "comment: " . $host_record->{comment} . "\n";
   }
 }
 
@@ -182,19 +182,20 @@ sub host_record {
       print("Cannot create new entry. Host record with specifyed hostname is already exists.\n");
       return -1;
     }
-    my $fixed_addr = "";
+    my $ipv4addrs = [];
     if ($ipv4addr ne "") {
-      $fixed_addr = Infoblox::DHCP::FixedAddr->new(
+      my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
         mac => $mac,
         ipv4addr => $ipv4addr,
         configure_for_dhcp => $configure_for_dhcp,
         comment => $comment
       );
+      $ipv4addrs = [$fixed_addr];
     }
     my $host_record = Infoblox::DNS::Host->new(
       name => $fqdn,
-      ipv4addrs => $self->to_array_ref($fixed_addr),
-      ipv6addrs => $self->to_array_ref($ipv6addr),
+      ipv4addrs => $ipv4addrs,
+      ipv6addrs => ['::1'], # FIXME
       aliases => $aliases,
       comment => $comment
     );
@@ -203,21 +204,32 @@ sub host_record {
     my $response = $self->{session}->add($host_record)
       or print("Create new host_record failed: \n",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
+    # FIXME
+    # hack for create host record bug (?)
+    # If ipv6addrs = [], Session->add() request fails the following error.
+    # 1012:A host record requires at least one IP Address.
+    # So thus, once register new entry with '::1' address then update
+    # the entry with the proper ipv6addrs value.
+    $host_record->ipv6addrs($self->to_array_ref($ipv6addr));
+    # for debug
+    #$self->print_host_records([$host_record]);
+    my $response = $self->{session}->modify($host_record)
+      or print("Modify new host_record failed: \n",
+      $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   } elsif ($operation eq 'update') { # Update
     if ($#host_records == -1) {
       print("Cannot find any host_record for updating with specified hostname.\n");
       return -1;
     }
-    my $fixed_addr = "";
+    my $ipv4addrs = [];
     if ($ipv4addr ne "") {
-      $fixed_addr = $host_records[0]->ipv4addrs->[0];
+      my $fixed_addr = $host_records[0]->ipv4addrs->[0];
       if (ref($fixed_addr) eq "Infoblox::DHCP::FixedAddr") {
         $fixed_addr->mac($mac);
         $fixed_addr->ipv4addr($ipv4addr);
         $fixed_addr->configure_for_dhcp($configure_for_dhcp);
         $fixed_addr->comment($comment);
       } else {
-        #$fixed_addr = $ipv4addr;
         $fixed_addr = Infoblox::DHCP::FixedAddr->new(
           mac => $mac,
           ipv4addr => $ipv4addr,
@@ -225,9 +237,10 @@ sub host_record {
           comment => $comment
         );
       }
+      $ipv4addrs = [$fixed_addr];
     }
     $host_records[0]->name($fqdn);
-    $host_records[0]->ipv4addrs($self->to_array_ref($fixed_addr));
+    $host_records[0]->ipv4addrs($ipv4addrs);
     $host_records[0]->ipv6addrs($self->to_array_ref($ipv6addr));
     $host_records[0]->aliases($aliases);
     $host_records[0]->comment($comment);
