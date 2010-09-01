@@ -90,10 +90,10 @@ class SyncWorker < Rinda::Worker
     end
 
     tasks = []
+    tasks = tasks + to_infoblox_task("delete", deleted_addrs)
     tasks = tasks + to_infoblox_task("create", created_addrs)
     tasks = tasks + to_infoblox_task("update", updated_addrs)
     tasks = tasks + to_infoblox_task("update", additional_addrs)
-    tasks = tasks + to_infoblox_task("delete", deleted_addrs)
 
     # output tmp/infoblox/year-month-day-hour-minute-sec-usec.yml
     # those files should be removed by cron_worker (after a week seems to be good
