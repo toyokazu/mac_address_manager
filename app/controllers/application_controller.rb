@@ -38,4 +38,10 @@ class ApplicationController < ActionController::Base
       redirect_back_or_default and return
     end
   end
+
+  # TupleSpace druby URI.
+  # If you use RingServer, you should specify nil.
+  def ts_uri
+    "druby://localhost:54321"
+  end
 end

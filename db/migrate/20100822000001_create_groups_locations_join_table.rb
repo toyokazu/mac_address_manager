@@ -4,9 +4,11 @@ class CreateGroupsLocationsJoinTable < ActiveRecord::Migration
       t.integer :group_id
       t.integer :location_id
     end
+    add_index :groups_locations, [:group_id, :location_id]
   end
 
   def self.down
+    remove_index :groups_locations, [:group_id, :location_id]
     drop_table :groups_locations
   end
 end

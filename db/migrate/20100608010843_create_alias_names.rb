@@ -9,9 +9,11 @@ class CreateAliasNames < ActiveRecord::Migration
       t.timestamps
     end
     AliasName.create_versioned_table
+    add_index :alias_names, :mac_address_id
   end
 
   def self.down
+    remove_index :alias_names, :mac_address_id
     AliasName.drop_versioned_table
     drop_table :alias_names
   end

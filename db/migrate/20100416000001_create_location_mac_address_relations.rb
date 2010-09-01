@@ -7,13 +7,13 @@ class CreateLocationMacAddressRelations < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :location_mac_address_relations, [:location_id, :mac_address_id]
     LocationMacAddressRelation.create_versioned_table
+    add_index :location_mac_address_relations, [:location_id, :mac_address_id]
   end
 
   def self.down
-    LocationMacAddressRelation.drop_versioned_table
     remove_index :location_mac_address_relations, [:location_id, :mac_address_id]
+    LocationMacAddressRelation.drop_versioned_table
     drop_table :location_mac_address_relations
   end
 end

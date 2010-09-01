@@ -27,7 +27,13 @@ class MacAddressesController < ApplicationController
       format.csv do
         CSV::Writer.generate(output = "", "\t") do |csv|
           @mac_addresses.each do |mac_addr|
-            csv << [mac_addr.hostname, mac_addr.mac_addr, mac_addr.description]
+            ip_addr = nil
+            if (mac_addr.ipv4_addr.nil? || mac_addr.ipv4_addr.empty?)
+              ip_addr = mac_addr.ipv6_addr
+            else
+              ip_addr = mac_addr.ipv4_addr
+            end
+            csv << [mac_addr.hostname, mac_addr.mac_addr, mac_addr.description, ip_addr]
           end
         end
         send_data(output, :type => 'text/csv')
@@ -109,7 +115,7 @@ class MacAddressesController < ApplicationController
 
   # POST /mac_addresses/update_all
   def update_all
-    client = Rinda::Client.new('update', :key => session[:session_id])
+    client = Rinda::Client.new('update', :ts_uri => ts_uri, :key => session[:session_id])
     repeat_count = 3
     until client.worker.lock(current_user.default_group.id)
       sleep(1)

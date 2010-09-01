@@ -31,24 +31,43 @@ class UpdateWorker < Rinda::Worker
   #
   # assume input CSV data format as follows:
   #
-  # row[0]\trow[1]\trow[2]\n
-  # row[0]  row[1]  row[2]
-  # hostname\tmac_addr\tdescription\n
-  # hostname  mac_addr  description
-  # myhost  112233445566  Apple Xserve, 14225, Oomoto Lab.
+  # row[0]\trow[1]\trow[2]\nrow[3]
+  # row[0]  row[1]  row[2]  row[3]
+  # hostname\tmac_addr\tdescription\tip_address\n
+  # hostname  mac_addr  description ip_address
+  # myhost  11:22:33:44:55:66  Apple Xserve, 14225, Oomoto Lab.  133.101.56.100
+  #
+  # ip_address could be null. If not specified, free address is choosen from
+  # IP address range assigned to the user (group).
   def update_and_unlock(options = {})
     mac_addrs = MacAddress.all(:conditions => {:group_id => options[:group_id]})
+    group = Group.find(options[:group_id])
+    param_list = []
     CSV::Reader.parse(options[:csv], "\t") do |row|
+      ip_addr = nil
+      # ip address selection
+      if row[3].nil?
+        ip_addr = Network.next_ip(group.user)
+      else
+        ip_addr = IPAddr.new(row[3])
+      end
       # get older entry
-      match_mac_addrs, mac_addrs = mac_addrs.partition {|item| item.mac_addr == row[1]}
+      match_mac_addrs, mac_addrs = mac_addrs.partition {|item| item.hostname == row[0] && item.mac_addr == row[1]}
       if match_mac_addrs.size == 0
-        params = {:group_id => options[:group_id], :hostname => row[0], :mac_addr => row[1], :description => row[2]}
-        MacAddress.create(params)
+        ip_param = ip_addr.ipv4? ? {:ipv4_addr => ip_addr.to_s} : {:ipv6_addr => ip_addr.to_s}
+        params = {:group_id => options[:group_id], :hostname => row[0], :mac_addr => row[1], :description => row[2]}.merge(ip_param)
+        param_list << params
         logger.info("create entry: #{row[1]}")
       else
         mac_addr = match_mac_addrs.first
         mac_addr.hostname = row[0]
+        mac_addr.mac_addr = row[1]
         mac_addr.description = row[2]
+        if ip_addr.ipv4?
+          mac_addr.ipv4_addr = ip_addr.to_s
+        else
+          mac_addr.ipv6_addr = ip_addr.to_s
+        end
         mac_addr.save
         logger.info("update entry: #{row[1]}")
       end
@@ -56,6 +75,9 @@ class UpdateWorker < Rinda::Worker
     # The rest entries are deleted in the uploaded CSV file
     mac_addrs.each do |mac_addr|
       mac_addr.destroy
+    end
+    param_list.each do |params|
+      MacAddress.create(params)
     end
     unlock(options[:group_id])
   end
