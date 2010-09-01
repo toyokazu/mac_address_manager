@@ -126,6 +126,7 @@ class MacAddressesController < ApplicationController
       end
     end
     client.update_and_unlock_request(current_user.default_group.id, params[:file][:csv])
+    flash[:notice] = 'Your update request was submitted. Please wait a few minitues for the database to be updated.'
 
     respond_to do |format|
       format.html { redirect_to(root_path) }

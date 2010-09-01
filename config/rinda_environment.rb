@@ -8,6 +8,9 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
   config.load_paths += %W( #{RAILS_ROOT}/app/workers )
+  config.eager_load_paths += %W( #{RAILS_ROOT}/app/workers )
   config.gem "daemons"
+  config.gem "rubycas-client", :lib => "casclient"
+  config.gem "rubycas-client", :lib => "casclient/frameworks/rails/filter"
   config.time_zone = 'UTC'
 end
