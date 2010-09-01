@@ -26,7 +26,7 @@ sub start_session {
   );
   unless ($self->{session}) {
     print("Construct session failed: \n",
-      Infoblox::status_code() . ":" . Infoblox::status_detail()) . "\n";
+      Infoblox::status_code() . ":" . Infoblox::status_detail() . "\n");
     return -1;
   }
   print "Session (", $self->{server}, ") created successfully\n";
@@ -51,17 +51,25 @@ sub find_fixed_addr {
     print("Cannot find any fixed_addr with specified MAC or IP address (" . $mac . "/" . $ipv4addr . ").\n");
     return -1;
   }
+  $self->print_fixed_addrs(\@fixed_addrs);
+}
+
+sub print_fixed_addrs {
+  my $self = shift;
+  my ($fixed_addrs) = @_;
+
   print "Fixed Address\n";
-  foreach my $fixed_addr (@fixed_addrs) {
-    print "mac: " . $fixed_addr->mac . "\n";
-    print "ipv4addr: " . $fixed_addr->ipv4addr . "\n";
-    print "comment: " . $fixed_addr->comment . "\n";
+  foreach my $fixed_addr (@{$fixed_addrs}) {
+    print "  mac: " . $fixed_addr->mac . "\n";
+    print "  ipv4addr: " . $fixed_addr->ipv4addr . "\n";
+    print "  configure_for_dhcp: " . $fixed_addr->configure_for_dhcp . "\n";
+    print "  comment: " . $fixed_addr->comment . "\n";
   }
 }
 
 sub fixed_addr {
   my $self = shift;
-  my ($operation, $mac, $ipv4addr, $comment) = @_;
+  my ($operation, $mac, $ipv4addr, $configure_for_dhcp, $comment) = @_;
 
   my @fixed_addrs = $self->{session}->get(
     object => "Infoblox::DHCP::FixedAddr",
@@ -71,6 +79,7 @@ sub fixed_addr {
     my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
       mac => $mac,
       ipv4addr => $ipv4addr,
+      configure_for_dhcp => $configure_for_dhcp,
       comment => $comment
     );
     my $response = $self->{session}->add($fixed_addr)
@@ -121,12 +130,20 @@ sub find_host_record {
     print("Cannot find any host_record with specified hostname, IPv4 or IPv6  address.\n");
     return -1;
   }
+  $self->print_host_records(\@host_records);
+}
+
+sub print_host_records {
+  my $self = shift;
+  my ($host_records) = @_;
+  
   print "Host Records:\n";
-  foreach my $host_record (@host_records) {
+  foreach my $host_record (@{$host_records}) {
     print "name: " . $host_record->name . "\n";
     # ipv4addr has an array of string (IPv4 address) or FixedAddr instance
-    print "ipv4addr:\n";
+    print "ipv4addrs:\n";
     foreach my $ipv4addr (@{$host_record->ipv4addrs}) {
+      print "  --\n";
       if (ref($ipv4addr) eq "Infoblox::DHCP::FixedAddr") {
         print "  ipv4addr: " . $ipv4addr->ipv4addr . "\n";
         print "  mac: " . $ipv4addr->mac . "\n";
@@ -137,7 +154,7 @@ sub find_host_record {
       }
     }
     # ipv6addr has an array of string (IPv6 address)
-    print "ipv6addr:\n";
+    print "ipv6addrs:\n";
     foreach my $ipv6addr (@{$host_record->ipv6addrs}) {
       print "  " . $ipv6addr . "\n";
     }
@@ -152,24 +169,37 @@ sub find_host_record {
 sub host_record {
   my $self = shift;
   my ($operation, $name, $ipv4addr, $ipv6addr, $mac, $configure_for_dhcp, $aliases, $comment) = @_;
+  # normalize attributes
+  my $domain = ".cse.kyoto-su.ac.jp";
+  my $fqdn = $name . $domain;
+  my $aliases = $self->add_domain_to_aliases($aliases, $domain);
   my @host_records = $self->{session}->get(
     object => "Infoblox::DNS::Host",
-    name => $name
+    name => $fqdn
   );
-  if ($operation eq 'create' && $#host_records == -1) { # Create
-    my $fixed_addr = Infoblox::DHCP::FixedAddr->new(
-      mac => $mac,
-      ipv4addr => $ipv4addr,
-      ipv6addr => $ipv6addr,
-      configure_for_dhcp => $configure_for_dhcp,
-      comment => $comment
-    );
+  if ($operation eq 'create') { # Create
+    if ($#host_records >= 0) { # Already exists error
+      print("Cannot create new entry. Host record with specifyed hostname is already exists.\n");
+      return -1;
+    }
+    my $fixed_addr = "";
+    if ($ipv4addr ne "") {
+      $fixed_addr = Infoblox::DHCP::FixedAddr->new(
+        mac => $mac,
+        ipv4addr => $ipv4addr,
+        configure_for_dhcp => $configure_for_dhcp,
+        comment => $comment
+      );
+    }
     my $host_record = Infoblox::DNS::Host->new(
-      name => $name,
-      ipv4addrs => [$fixed_addr],
+      name => $fqdn,
+      ipv4addrs => $self->to_array_ref($fixed_addr),
+      ipv6addrs => $self->to_array_ref($ipv6addr),
       aliases => $aliases,
       comment => $comment
     );
+    # for debug
+    #$self->print_host_records([$host_record]);
     my $response = $self->{session}->add($host_record)
       or print("Create new host_record failed: \n",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
@@ -178,20 +208,31 @@ sub host_record {
       print("Cannot find any host_record for updating with specified hostname.\n");
       return -1;
     }
-    my $fixed_addr = $host_records[0]->ipv4addrs->[0];
-    if (ref($fixed_addr) eq "Infoblox::DHCP::FixedAddr") {
-      $fixed_addr->mac($mac);
-      $fixed_addr->ipv4addr($ipv4addr);
-      $fixed_addr->configure_for_dhcp($configure_for_dhcp);
-      $fixed_addr->comment($comment);
-    } else {
-      $fixed_addr = $ipv4addr;
+    my $fixed_addr = "";
+    if ($ipv4addr ne "") {
+      $fixed_addr = $host_records[0]->ipv4addrs->[0];
+      if (ref($fixed_addr) eq "Infoblox::DHCP::FixedAddr") {
+        $fixed_addr->mac($mac);
+        $fixed_addr->ipv4addr($ipv4addr);
+        $fixed_addr->configure_for_dhcp($configure_for_dhcp);
+        $fixed_addr->comment($comment);
+      } else {
+        #$fixed_addr = $ipv4addr;
+        $fixed_addr = Infoblox::DHCP::FixedAddr->new(
+          mac => $mac,
+          ipv4addr => $ipv4addr,
+          configure_for_dhcp => $configure_for_dhcp,
+          comment => $comment
+        );
+      }
     }
-    $host_records[0]->name($name);
-    $host_records[0]->ipv4addrs([$fixed_addr]);
-    $host_records[0]->ipv6addrs([$ipv6addr]);
+    $host_records[0]->name($fqdn);
+    $host_records[0]->ipv4addrs($self->to_array_ref($fixed_addr));
+    $host_records[0]->ipv6addrs($self->to_array_ref($ipv6addr));
     $host_records[0]->aliases($aliases);
     $host_records[0]->comment($comment);
+    # for debug
+    #$self->print_host_records(\@host_records);
     my $response = $self->{session}->modify($host_records[0])
       or print("Modify host_record (", $host_records[0]->name,") failed: \n",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
@@ -204,6 +245,27 @@ sub host_record {
       or print("Delete host_record (", $host_records[0]->name,") failed: \n",
       $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
   }
+}
+
+sub add_domain_to_aliases {
+  my $self = shift;
+  my ($aliases, $domain) = @_;
+
+  my $results = [];
+  foreach my $alias (@{$aliases}) {
+    push @{$results}, $alias . $domain;
+  }
+  return $results;
+}
+
+sub to_array_ref {
+  my $self = shift;
+  my ($value) = @_;
+
+  if ($value eq "") {
+    return [];
+  }
+  return [$value];
 }
 
 1;

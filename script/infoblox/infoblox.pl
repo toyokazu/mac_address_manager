@@ -45,7 +45,7 @@ if ($manager->start_session == -1) {
 }
 
 if ($opts{"F"}) {
-  $manager->find_fixed_addr($opts{"m"}, $opts{"4"}, $opts{"6"});
+  $manager->find_fixed_addr($opts{"m"}, $opts{"4"}, "true", $opts{"6"});
   exit;
 }
 if ($opts{"H"}) {
