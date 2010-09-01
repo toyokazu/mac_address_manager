@@ -26,6 +26,10 @@ module SSH
       @location = location
     end
 
+    def hosttype
+      @location["hosttype"]
+    end
+
     def hostname
       @location["hostname"]
     end
@@ -35,8 +39,8 @@ module SSH
     end
 
     def sync_from_serv_to_switch
-      username = @config[classname][hostname][0]
-      password = @config[classname][hostname][1]
+      username = @config[hosttype][hostname][0]
+      password = @config[hosttype][hostname][1]
       PTY.spawn("#{ssh_cmd} #{username}@#{ipv4_addr}") do |r, w|
         w.sync = true
         r.expect("#{username}@#{ipv4_addr}'s password: ") do
@@ -57,8 +61,8 @@ module SSH
     # This method creates MAC address filter configuration backup
     # for each switch every day. Then keep them for a month.
     def sync_from_switch_to_serv
-      username = @config[classname][hostname][0]
-      password = @config[classname][hostname][1]
+      username = @config[hosttype][hostname][0]
+      password = @config[hosttype][hostname][1]
       # create date directory if it does not exist.
       day = Time.now.strftime("%d")
       dst_dir = "#{@tftpd.path}/#{day}"
