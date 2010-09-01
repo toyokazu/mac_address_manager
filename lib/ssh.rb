@@ -52,7 +52,7 @@ module SSH
         r.expect("#{hostname}# ") do
           w.puts("copy tftp #{@tftpd.default_addr} #{hostname}_aaa-local-db.csv aaa-local-db")
         end
-        r.expect("done.\n#{hostname}# ") do
+        r.expect("#{hostname}# ") do
           w.puts("exit")
         end
       end
@@ -78,7 +78,7 @@ module SSH
         r.expect("#{hostname}# ") do
           w.puts("copy aaa-local-db tftp #{@tftpd.default_addr} #{dst_dir}/#{hostname}_aaa-local-db.csv")
         end
-        r.expect("done.\n#{hostname}# ") do
+        r.expect("#{hostname}# ") do
           w.puts("exit")
         end
       end
