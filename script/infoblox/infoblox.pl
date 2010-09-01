@@ -54,7 +54,7 @@ if ($opts{"H"}) {
 }
 
 # read task file
-my $tasks = LoadFile($opt_f || $directory . "/tasks.yml");
+my $tasks = LoadFile($opts{"f"} || $directory . "/tasks.yml");
 # process tasks
 foreach (@{$tasks}) {
   # FIXME
