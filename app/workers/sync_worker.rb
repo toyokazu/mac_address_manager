@@ -52,6 +52,15 @@ class SyncWorker < Rinda::Worker
       [created_addrs, updated_addrs, deleted_addrs, additional_addrs]
     end
 
+    def generate_aaa_local_db(location, passwd)
+      csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
+      CSV.open(csv_file, "wb", "\t") do |csv|
+        location.mac_addresses.each do |mac_addr|
+          csv << [mac_addr.packed_mac_addr, passwd]
+        end
+      end
+    end
+
     protected
     def with_older_version?(addrs)
       updated_addrs = []
@@ -65,15 +74,6 @@ class SyncWorker < Rinda::Worker
 
     def updated_alias_names(time)
       AliasName.changed_after(time)
-    end
-
-    def generate_aaa_local_db(location, passwd)
-      csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
-      CSV.open(csv_file, "wb", "\t") do |csv|
-        location.mac_addresses.each do |mac_addr|
-          csv << [mac_addr.packed_mac_addr, passwd]
-        end
-      end
     end
   end
 
