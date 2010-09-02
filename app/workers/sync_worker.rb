@@ -66,6 +66,15 @@ class SyncWorker < Rinda::Worker
     def updated_alias_names(time)
       AliasName.changed_after(time)
     end
+
+    def generate_aaa_local_db(location, passwd)
+      csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
+      CSV.open(csv_file, "wb", "\t") do |csv|
+        location.mac_addresses.each do |mac_addr|
+          csv << [mac_addr.packed_mac_addr, passwd]
+        end
+      end
+    end
   end
 
   def initialize(ts, options = {})
@@ -117,13 +126,9 @@ class SyncWorker < Rinda::Worker
     diff_addrs.each do |diff_addr|
       locations = (locations + diff_addr.locations).uniq
     end
+    passwd = TFTPD.aaa_local_db_passwd
     locations.each do |location|
-      csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
-      CSV.open(csv_file, "wb", "\t") do |csv|
-        location.mac_addresses.each do |mac_addr|
-          csv << [mac_addr.packed_mac_addr]
-        end
-      end
+      SyncWorker.generate_aaa_local_db(location, passwd)
       # submit Switch task into TupleSpace
       @switch_client.write_request("update", location.attributes)
     end

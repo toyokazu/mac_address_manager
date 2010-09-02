@@ -3,13 +3,14 @@ require 'fileutils'
 require 'yaml'
 
 class TFTPD
-  attr_reader :user, :path, :default_addr
+  attr_reader :user, :path, :default_addr, :aaa_local_db_passwd
 
   def initialize
     @config = YAML.load_file("#{RAILS_ROOT}/config/tftpd.yml")
     @user = @config["user"] || `/usr/bin/env id -un`.strip
     @path = @config["path"] || "#{RAILS_ROOT}/tmp/tftproot"
     @default_addr = @config["default_addr"]
+    @aaa_local_db_passwd = @config["aaa_local_db_passwd"]
   end
 
   def addr_option
