@@ -126,7 +126,7 @@ class SyncWorker < Rinda::Worker
     diff_addrs.each do |diff_addr|
       locations = (locations + diff_addr.locations).uniq
     end
-    passwd = TFTPD.aaa_local_db_passwd
+    passwd = TFTPD.new.aaa_local_db_passwd
     locations.each do |location|
       SyncWorker.generate_aaa_local_db(location, passwd)
       # submit Switch task into TupleSpace
