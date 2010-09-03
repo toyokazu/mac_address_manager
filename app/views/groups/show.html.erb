@@ -8,5 +8,7 @@
   <%=h @group.display_name %>
 </p>
 
-<%= link_to '編集', edit_group_path(@group) %> |
-<%= link_to '戻る', groups_path %>
+<%= link_to '編集', edit_group_path(@group) %>
+<% if controller.admin_user? %>
+| <%= link_to '戻る', groups_path %>
+<% end %>

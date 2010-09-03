@@ -26,4 +26,6 @@
 
 <br />
 
+<% if controller.admin_user? %>
 <%= link_to '新規接続先登録', new_location_path %>
+<% end %>

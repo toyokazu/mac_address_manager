@@ -15,5 +15,9 @@
   </p>
 <% end %>
 
+<% if controller.admin_user? %>
 <%= link_to '詳細', @user %> |
 <%= link_to '戻る', users_path %>
+<% else %>
+<%= link_to '戻る', @user %>
+<% end %>

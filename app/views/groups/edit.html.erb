@@ -27,5 +27,9 @@
   </p>
 <% end %>
 
-<%= link_to '詳細', @group %> |
+<% if controller.admin_user? %>
+<%= link_to '詳細', @group %>|
 <%= link_to '戻る', groups_path %>
+<% else %>
+<%= link_to '戻る', @group %>
+<% end %>

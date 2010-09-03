@@ -14,9 +14,15 @@
 </p>
 
 <p>
-  <b>デフォルトグループ:</b>
-  <%=h @user.default_group.display_name %>
+<b>デフォルトグループ:</b>
+  <% if controller.admin_user? %>
+    <%=h @user.default_group.display_name %>
+  <% else %>
+    <%=link_to @user.default_group.display_name, @user.default_group %>
+  <% end %>
 </p>
 
-<%= link_to '編集', edit_user_path(@user) %> |
-<%= link_to '戻る', users_path %>
+<%= link_to '編集', edit_user_path(@user) %>
+<% if controller.admin_user? %>
+| <%= link_to '戻る', users_path %>
+<% end %>

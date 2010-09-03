@@ -5,7 +5,7 @@ use Infoblox;
 
 sub new {
   my $class = shift;
-  my ($server, $username, $password) = @_;
+  my ($server, $username, $password, $member) = @_;
   my $self = {
     server => $server,
     username => $username,
@@ -30,6 +30,21 @@ sub start_session {
     return -1;
   }
   print "Session (", $self->{server}, ") created successfully\n";
+}
+
+sub restart_status {
+  my $self = shift;
+
+  return $self->{session}->restart_status();
+}
+
+sub restart {
+  my $self = shift;
+
+  my $result = $self->{session}->restart(
+    when => "now"
+  ) or print("Restart dhcp service failed: \n",
+    $self->{session}->status_code() . ":" . $self->{session}->status_detail() . "\n");
 }
 
 sub find_fixed_addr {

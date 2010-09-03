@@ -27,16 +27,19 @@
       <div class="sidebar">
         <% if controller.authorized? %>
           <ul>
-            <li><%= link_to 'ユーザ一覧', users_path %></li>
-            <li><%= link_to 'グループ一覧', groups_path %></li>
           <% if controller.admin_user? %>
-            <li><%= link_to 'ロール一覧', roles_path %></li>
+            <li><%= link_to 'ユーザ', users_path %></li>
+            <li><%= link_to 'グループ', groups_path %></li>
+            <li><%= link_to 'ロール', roles_path %></li>
             <li><%= link_to '接続先一覧', locations_path %></li>
           <% else %>
+            <li><%= link_to 'アカウント', controller.current_user %></li>
             <li><%= link_to '接続先一覧', locations_path %></li>
           <% end %>
-            <li><%= link_to 'IPアドレス割当一覧', networks_path %></li>
-            <li><%= link_to 'MACアドレス一覧', mac_addresses_path %></li>
+            <!--<li><%= link_to 'IPアドレス割当一覧', networks_path %></li>-->
+            <li><%= link_to '各研究室アドレス範囲', networks_path %></li>
+            <!--<li><%= link_to 'MACアドレス一覧', mac_addresses_path %></li>-->
+            <li><%= link_to 'IPアドレス割当状況', mac_addresses_path %></li>
           </ul>
         <% end %>
       </div>

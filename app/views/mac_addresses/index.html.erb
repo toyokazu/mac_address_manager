@@ -1,4 +1,5 @@
-<h1>MACアドレス一覧</h1>
+<h1>IPアドレス割当状況</h1>
+<!--<h1>MACアドレス一覧</h1>-->
 
 <table>
   <tr>
@@ -52,7 +53,8 @@
 
 <br />
 
-<%= link_to '新規MACアドレス登録', new_mac_address_path %><br/>
+<%= link_to '新規IPアドレス登録', new_mac_address_path %><br/>
+<!--<%= link_to '新規MACアドレス登録', new_mac_address_path %><br/>-->
 <% if @group.nil? || !controller.admin_user? %>
 <%= link_to 'CSVファイルのダウンロード', mac_addresses_path + ".csv" %><br/>
 <% else %>

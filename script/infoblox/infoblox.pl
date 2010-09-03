@@ -26,7 +26,7 @@ use lib $directory;
 use InfobloxManager;
 
 our %opts;
-getopts('4:6:f:Fh:Hm:', \%opts);
+getopts('4:6:f:Fh:Hm:rR', \%opts);
 # 4: search key (IPv4 Address)
 # 6: search key (IPv6 Address)
 # f: file name of the task file (task.yml)
@@ -34,12 +34,14 @@ getopts('4:6:f:Fh:Hm:', \%opts);
 # h: search key (hostname)
 # H: search HostRecord
 # m: search key (MAC Address)
+# r: get restart status (service names which are restarted by restart() method)
+# R: restart dhcp service
 
 # read config
 my $config = LoadFile($directory . "/config.yml");
 
 # setup session
-my $manager = InfobloxManager->new($config->{'server'}, $config->{'username'}, $config->{'password'});
+my $manager = InfobloxManager->new($config->{'server'}, $config->{'username'}, $config->{'password'}, $config->{'member'});
 if ($manager->start_session == -1) {
   die("An error occurred during session creation.");
 }
@@ -50,6 +52,17 @@ if ($opts{"F"}) {
 }
 if ($opts{"H"}) {
   $manager->find_host_record($opts{"h"}, $opts{"4"}, $opts{"6"});
+  exit;
+}
+if ($opts{"r"}) {
+  @services = $manager->restart_status();
+  foreach my $service (@services) {
+    print $service . "\n";
+  }
+  exit;
+}
+if ($opts{"R"}) {
+  $manager->restart();
   exit;
 }
 
@@ -63,3 +76,5 @@ foreach (@{$tasks}) {
   $manager->$method(@{$args})
 }
 
+# restart dhcp service after FixedAddress update
+$manager->restart();
