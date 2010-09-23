@@ -49,9 +49,13 @@ sub restart {
 
 sub find_fixed_addr {
   my $self = shift;
-  my ($mac, $ipv4addr) = @_;
+  my ($mac, $ipv4addr, $all) = @_;
   my @fixed_addrs = ();
-  if ($mac ne undef) {
+  if ($all ne undef) {
+    @fixed_addrs = $self->{session}->search(
+      object => "Infoblox::DHCP::FixedAddr"
+    );
+  } elsif ($mac ne undef) {
     @fixed_addrs = $self->{session}->search(
       object => "Infoblox::DHCP::FixedAddr",
       mac => $mac
@@ -123,9 +127,13 @@ sub fixed_addr {
 
 sub find_host_record {
   my $self = shift;
-  my ($name, $ipv4addr, $ipv6addr) = @_;
+  my ($name, $ipv4addr, $ipv6addr, $all) = @_;
   my @host_records = ();
-  if ($name ne undef) {
+  if ($all ne undef) {
+    @host_records = $self->{session}->search(
+      object => "Infoblox::DNS::Host"
+    );
+  } elsif ($name ne undef) {
     @host_records = $self->{session}->search(
       object => "Infoblox::DNS::Host",
       name => $name
