@@ -33,7 +33,7 @@ class MacAddressesController < ApplicationController
             else
               ip_addr = mac_addr.ipv4_addr
             end
-            csv << [mac_addr.hostname, mac_addr.mac_addr, mac_addr.description, ip_addr]
+            csv << [mac_addr.hostname, mac_addr.mac_addr, mac_addr.description, ip_addr, mac_addr.vlan_id]
           end
         end
         send_data(output, :type => 'text/csv')

@@ -6,6 +6,7 @@ class CreateMacAddresses < ActiveRecord::Migration
       t.string :mac_addr
       t.string :ipv4_addr
       t.string :ipv6_addr
+      t.integer :vlan_id, :default => 92
       t.boolean :dhcp, :default => true
       t.string :description
       t.timestamp :deleted_at

@@ -21,6 +21,10 @@
   </p>
   <% if controller.admin_user? %>
   <p>
+    <%= form.label :vlan_id, 'VLAN ID' %><br />
+    <%= form.text_field :vlan_id %>
+  </p>
+  <p>
     <%= form.label :dhcp, 'DHCPを利用する' %><br />
     <%= form.radio_button :dhcp, true, :checked => @mac_address.dhcp  %>true
     <%= form.radio_button :dhcp, false, :checked => !@mac_address.dhcp  %>false

@@ -44,8 +44,8 @@ namespace :setup do
       admin = User.first(:conditions => {:name => 'admin'})
       users = User.all(:conditions => ["name IS NOT 'admin'"])
       # cse_hosts.csv from Google Docs
-      # IPaddr, hostname, MACaddr, Comments, Supplemental
-      # row[0], row[1],   row[2],  row[3],   row[4]
+      # IPaddr, hostname, MACaddr, Comments, Supplemental, Vlan ID
+      # row[0], row[1],   row[2],  row[3],   row[4],       row[5]
       CSV::Reader.parse(File.open(ENV["CSV_IN"] || "#{RAILS_ROOT}/db/cse_hosts.csv", "rb")) do |row|
         # skip invalid address entry.
         begin
@@ -67,7 +67,7 @@ namespace :setup do
         mac_addr = row[2].nil? ? nil : MacAddress.normalize_mac_addr(row[2])
         mac_address =
           MacAddress.first(:conditions => {:ipv4_addr => row[0], :hostname => row[1], :mac_addr => mac_addr}) ||
-          MacAddress.create(:ipv4_addr => row[0], :hostname => row[1], :mac_addr => row[2], :description => row[3], :group => owner.default_group)
+          MacAddress.create(:ipv4_addr => row[0], :hostname => row[1], :mac_addr => row[2], :description => row[3], :vlan_id => row[5].to_i, :group => owner.default_group)
         mac_address.location_ids = owner.default_group.location_ids
         mac_address.save
       end

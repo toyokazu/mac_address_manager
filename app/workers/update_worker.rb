@@ -31,11 +31,11 @@ class UpdateWorker < Rinda::Worker
   #
   # assume input CSV data format as follows:
   #
-  # row[0]\trow[1]\trow[2]\nrow[3]
-  # row[0]  row[1]  row[2]  row[3]
-  # hostname\tmac_addr\tdescription\tip_address\n
-  # hostname  mac_addr  description ip_address
-  # myhost  11:22:33:44:55:66  Apple Xserve, 14225, Oomoto Lab.  133.101.56.100
+  # row[0]\trow[1]\trow[2]\nrow[3]\nrow[4]
+  # row[0]  row[1]  row[2]  row[3]  row[4]
+  # hostname\tmac_addr\tdescription\tip_address\nvlan_id
+  # hostname  mac_addr  description ip_address  vlan_id
+  # myhost  11:22:33:44:55:66  Apple Xserve, 14225, Oomoto Lab.  133.101.56.100 92
   #
   # ip_address could be null. If not specified, free address is choosen from
   # IP address range assigned to the user (group).
@@ -55,7 +55,7 @@ class UpdateWorker < Rinda::Worker
       match_mac_addrs, mac_addrs = mac_addrs.partition {|item| item.hostname == row[0] && item.mac_addr == row[1]}
       if match_mac_addrs.size == 0
         ip_param = ip_addr.ipv4? ? {:ipv4_addr => ip_addr.to_s} : {:ipv6_addr => ip_addr.to_s}
-        params = {:group_id => options[:group_id], :hostname => row[0], :mac_addr => row[1], :description => row[2]}.merge(ip_param)
+        params = {:group_id => options[:group_id], :hostname => row[0], :mac_addr => row[1], :description => row[2], :vlan_id => row[4].to_i}.merge(ip_param)
         param_list << params
         logger.info("create entry: #{row[1]}")
       else
@@ -63,6 +63,7 @@ class UpdateWorker < Rinda::Worker
         mac_addr.hostname = row[0]
         mac_addr.mac_addr = row[1]
         mac_addr.description = row[2]
+        mac_addr.vlan_id = row[4]
         if ip_addr.ipv4?
           mac_addr.ipv4_addr = ip_addr.to_s
         else

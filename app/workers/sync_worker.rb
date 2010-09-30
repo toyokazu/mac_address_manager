@@ -1,4 +1,6 @@
 require 'csv'
+require 'fileutils'
+require 'uri'
 require 'openssl'
 class SyncWorker < Rinda::Worker
   class << self # Class Methods
@@ -50,15 +52,6 @@ class SyncWorker < Rinda::Worker
         end
       end
       [created_addrs, updated_addrs, deleted_addrs, additional_addrs]
-    end
-
-    def generate_aaa_local_db(location, passwd)
-      csv_file = "#{RAILS_ROOT}/tmp/tftproot/#{location.hostname}_aaa-local-db.csv"
-      CSV.open(csv_file, "wb", "\t") do |csv|
-        location.mac_addresses.each do |mac_addr|
-          csv << [mac_addr.packed_mac_addr, passwd]
-        end
-      end
     end
 
     protected
@@ -126,9 +119,10 @@ class SyncWorker < Rinda::Worker
     diff_addrs.each do |diff_addr|
       locations = (locations + diff_addr.locations).uniq
     end
-    passwd = TFTPD.new.aaa_local_db_passwd
+    tftpd = TFTPD.new
+    passwd = tftpd.aaa_local_db_passwd
     locations.each do |location|
-      SyncWorker.generate_aaa_local_db(location, passwd)
+      SwitchWorker.generate_aaa_local_db(tftpd.path, location, passwd)
       # submit Switch task into TupleSpace
       @switch_client.write_request("update", location.attributes)
     end

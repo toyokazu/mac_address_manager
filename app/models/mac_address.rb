@@ -8,7 +8,7 @@ class MacAddress < ActiveRecord::Base
   acts_as_versioned
   acts_as_paranoid
 
-  validates_presence_of :group_id, :hostname, :mac_addr
+  validates_presence_of :group_id, :hostname, :mac_addr, :vlan_id
 
   named_scope :created_after, lambda {|time|
     return {} if time.nil?
@@ -24,7 +24,7 @@ class MacAddress < ActiveRecord::Base
   }
 
   def packed_mac_addr
-    self.mac_addr.downcase.gsub(':', '')
+    MacAddress.pack_mac_addr(self.mac_addr)
   end
 
   def before_save
@@ -75,7 +75,7 @@ class MacAddress < ActiveRecord::Base
   end
 
   def validate_mac_addr
-    !self.mac_addr.nil? && self.mac_addr.match(/^\s*([\da-z]{2}:){5}[\da-z]{2}\s*/)
+    !self.mac_addr.nil? && MacAddress.validate_mac_addr(self.mac_addr)
   end
 
   class << self
@@ -87,6 +87,14 @@ class MacAddress < ActiveRecord::Base
         mac_addr = mac_addr.gsub(/^\s*([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})([\da-z]{2})\s*$/, '\1:\2:\3:\4:\5:\6')
       end
       mac_addr
+    end
+
+    def validate_mac_addr(mac_addr)
+      mac_addr.match(/^\s*([\da-z]{2}:){5}[\da-z]{2}\s*/)
+    end
+
+    def pack_mac_addr(mac_addr)
+      mac_addr.downcase.gsub(':', '')
     end
   end
 end
